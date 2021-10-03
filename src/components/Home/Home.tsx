@@ -2,8 +2,7 @@ import React, {useEffect, useState} from "react";
 import {SideBar} from "../Common/SideBar/SideBar";
 import firebase from "firebase";
 import {Video} from "../Common/Video/Video";
-import ReactPlayer from 'react-player'
-import { padding } from "@mui/system";
+import ReactPlayer from 'react-player';
 
 interface IVideo {
     videDuration : string;
@@ -103,14 +102,23 @@ export function Home() {
                         <div className="feedback_area row mt-2">
                         <div className="like_section d-flex justify-content-start col-sm">
                             { like
-                                ? <div><button onClick={() => setLike(!like)}>Liked</button></div>
-                                : <div><button onClick={() => setLike(!like)}>Like</button></div>
+                                ? <div><button onClick={() => setLike(!like)} style={{borderRadius:'5px'}}>
+                                    <div className="like_btn" >
+                                        <i className="material-icons"  style={{color:'#0571ed'}}>thumb_up</i>
+                                        <span  style={{color:'#0571ed'}}>Liked</span>
+                                    </div>
+                                  </button>
+                                  </div>
+                                : <div><button onClick={() => setLike(!like)}>
+                                    <div className="like_btn">
+                                        <i className="material-icons" >thumb_up</i>
+                                        <span>Like</span>
+                                    </div>
+                                    </button>
+                                    </div>
                             }
                         </div>
-                        <div className="comment_section d-flex justify-content-center col-md">
-                            <input type="text" placeholder="Comment..."/>
-                            <button type="submit"><img src="./images/play-solid.svg" alt="" /></button>
-                        </div>
+                        
                         </div>
                     </div>
                     : null

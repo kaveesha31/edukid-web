@@ -7,6 +7,7 @@ import {Home} from "./components/Home/Home";
 import {Login} from "./components/Login/Login";
 import {Signup} from "./components/SignUp/SignUp";
 import { ClassRoom } from './components/ClassRoom/ClassRoom';
+import { StudentList} from './components/StudenList/StudentList'
 
 
 const history = createBrowserHistory();
@@ -19,6 +20,7 @@ function App() {
           <Route path="/login" component={Login} exact />
           <Route path="/signup" component={Signup} exact />
           <Route path="/classrooms" component={ClassRoom} exact />
+          <Route path="/classrooms/:name" component={StudentList} exact />
         </Switch>
       </Router>
   );

@@ -67,6 +67,7 @@ position : absolute;
 .dropdown {
   position: relative;
   display: inline-block;
+  background: none;
 }
 
 .dropdown-content {
@@ -89,7 +90,9 @@ position : absolute;
 
 .dropdown:hover .dropdown-content {display: block;}
 
-.dropdown:hover .dropbtn {background-color: #3e8e41;}
+.dropdown:hover .dropbtn {
+  background: #e5e5e5;
+}
 
 .dropdown-content p {margin-left:16px ;}
 
@@ -126,12 +129,23 @@ position : absolute;
   background-color: #3d68be;
 }
 
-.comment_section input{
-  border-radius:5px 0 0 5px;
-  padding: 3px;
+.like_btn {
+  display: flex;
+  align-items: center;
+  border-radius: 5px;
+
 }
-.comment_section button{
-  border-radius:0 5px 5px 0;
-  width:30px;
-  padding:3px;
+
+.like_btn span {
+  margin-left: 15px;
+  font-weight: 700;
+}
+
+.like_btn:hover {
+  cursor: pointer;
+}
+.like_section button{
+  border-radius:5px;
+  border: none;
+  background:none;
 }
