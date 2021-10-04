@@ -8,6 +8,7 @@ import {Login} from "./components/Login/Login";
 import {Signup} from "./components/SignUp/SignUp";
 import { ClassRoom } from './components/ClassRoom/ClassRoom';
 import { StudentList} from './components/StudenList/StudentList'
+import { Landing } from './components/Landing/Landing';
 
 
 const history = createBrowserHistory();
@@ -16,7 +17,9 @@ function App() {
   return (
       <Router history={history}>
         <Switch>
-          <Route path="/" component={Home} exact />
+          
+          <Route path="/" component={Landing} exact />
+          <Route path="/home" component={Home} exact />
           <Route path="/login" component={Login} exact />
           <Route path="/signup" component={Signup} exact />
           <Route path="/classrooms" component={ClassRoom} exact />
