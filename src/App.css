@@ -149,3 +149,23 @@ position : absolute;
   border: none;
   background:none;
 }
+
+.home_nav {
+  padding: 16px;
+  border: none;
+  background: none;
+  font-weight: 500;
+  border-radius: 10px;
+  text-decoration: none;
+  color: #000;
+}
+
+.home_nav:hover{
+  background-color: #3d68be;
+  text-decoration: none;
+  color: #fff;
+}
+
+.image-girl {
+  width: 35rem;
+}

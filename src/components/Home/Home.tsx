@@ -70,7 +70,7 @@ export function Home() {
                         alt=""
                     />
                     <a href="/">
-                        <img src="logos/logo.png" alt="" />
+                        <img src="logos/logo.png" alt="" style={{width:"50%"}}/>
                     </a>
                 </div>
 
