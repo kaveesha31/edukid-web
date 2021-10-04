@@ -137,6 +137,7 @@ export function Signup() {
     </React.Fragment>
   );
 
+  //validate register form
   const validateRegisterFormData = (): boolean => {
 
     const flnValidation = Validator.validateString(
@@ -237,6 +238,7 @@ export function Signup() {
     });
   };
 
+  //register function
   const handleRegister = () => {
     setLoading(true);
     fire
