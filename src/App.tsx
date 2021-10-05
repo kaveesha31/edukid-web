@@ -9,7 +9,6 @@ import { SignUp } from "./components/SignUp/SignUp";
 import { ClassRoom } from './components/ClassRoom/ClassRoom';
 import { StudentList } from './components/StudenList/StudentList';
 import { AuthProvider } from "./contexts/userContext";
-import { Landing } from './components/Landing/Landing';
 import { Quiz } from './components/Quiz/Quiz';
 import  {Landing} from "../src/components/Landing/Landing";
 

@@ -46,7 +46,7 @@ export function ClassRoom() {
                 <div className="container">
                     <div className="row">
                         <div className="col-sm">
-                            <a href="/classrooms/03">
+                            <a href="/classrooms/G-03">
                             <div className="class_name d-flex justify-content-center mt-1 mb-1 align-middle">
                                 <div className="text">
                                     Grade 03
@@ -55,7 +55,7 @@ export function ClassRoom() {
                             </a>
                         </div>
                         <div className="col-sm">
-                            <a href="/classrooms/04">
+                            <a href="/classrooms/G-04">
                             <div className="class_name d-flex justify-content-center mt-1 mb-1 align-middle">
                                 <div className="text">
                                     Grade 04
@@ -64,7 +64,7 @@ export function ClassRoom() {
                             </a>
                         </div>
                         <div className="col-sm">
-                            <a href="/classrooms/05">
+                            <a href="/classrooms/G-05">
                             <div className="class_name d-flex justify-content-center mt-1 mb-1 align-middle">
                                 <div className="text">
                                     Grade 05
@@ -75,7 +75,7 @@ export function ClassRoom() {
                     </div>
                     <div className="row">
                         <div className="col-sm">
-                            <a href="/classrooms/06">
+                            <a href="/classrooms/G-06">
                             <div className="class_name d-flex justify-content-center mt-1 mb-1 align-middle">
                                 <div className="text">
                                     Grade 06
@@ -84,7 +84,7 @@ export function ClassRoom() {
                             </a>
                         </div>
                         <div className="col-sm">
-                            <a href="/classrooms/07">
+                            <a href="/classrooms/G-07">
                             <div className="class_name d-flex justify-content-center mt-1 mb-1 align-middle">
                                 <div className="text">
                                     Grade 07
@@ -93,7 +93,7 @@ export function ClassRoom() {
                             </a>
                         </div>
                         <div className="col-sm">
-                            <a href="/classrooms/08">
+                            <a href="/classrooms/G-08">
                             <div className="class_name d-flex justify-content-center mt-1 mb-1 align-middle">
                                 <div className="text">
                                     Grade 08
