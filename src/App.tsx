@@ -11,6 +11,7 @@ import { StudentList } from './components/StudenList/StudentList';
 import { AuthProvider } from "./contexts/userContext";
 import { Landing } from './components/Landing/Landing';
 import { Quiz } from './components/Quiz/Quiz';
+import  {Landing} from "../src/components/Landing/Landing";
 
 
 const history = createBrowserHistory();
@@ -20,7 +21,8 @@ function App() {
     <AuthProvider>
       <Router history={history}>
         <Switch>
-          <Route path="/" component={() => {
+        <Route path="/" component={Landing} exact />
+          <Route path="/home" component={() => {
             if (
               sessionStorage.getItem("isAuthed") === "true" ||
               localStorage.getItem("isAuthed") === "true"

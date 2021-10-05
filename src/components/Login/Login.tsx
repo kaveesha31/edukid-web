@@ -133,7 +133,7 @@ export function Login() {
         if(authContext.userType === "teacher"){
           history.push("/classrooms");
         } else {
-          history.push("/");
+          history.push("/home");
         }
       })
       .catch((err) => {
