@@ -24,6 +24,7 @@ export function Home() {
     const likeCount = 0;
     const [videoURL, setVideoURL] = useState<string>("");
     const [like, setLike] = useState<boolean>(false);
+    const [quizBtn, setQuizBtn] = useState<boolean>(false);
     
 
     useEffect(() => {
@@ -98,7 +99,7 @@ export function Home() {
                 <div className="videos">
                     { videoURL
                     ? <div className="video_player">
-                        <ReactPlayer url={videoURL} controls={true}/>
+                        <ReactPlayer url={videoURL} controls={true} onEnded={() => setQuizBtn(true)}/>
                         <div className="feedback_area row mt-2">
                         <div className="like_section d-flex justify-content-start col-sm">
                             { like
@@ -118,6 +119,20 @@ export function Home() {
                                     </div>
                             }
                         </div>
+
+                        <div className="quiz_section d-flex justify-content-start col-sm">
+                            { quizBtn
+
+                                ? <div className="quiz_bt_area"><a href="/quiz" >
+                                    <div className="quiz_btn" >
+                                        <i className="material-icons">quiz</i>
+                                        <span>Attempt Quiz</span>
+                                    </div>
+                                  </a>
+                                  </div>
+                                : null
+                            }
+                        </div>
                         
                         </div>
                     </div>
@@ -129,10 +144,10 @@ export function Home() {
                                 
                                 return (<div className="itemsContainer">
                                                 <div className="image">
-                                                <a onClick={() => setVideoURL(video.videoUrl)} style={{textDecoration:"none"}}><Video title={video.videoTitle} thumbnail={video.videoImage}
+                                                <a onClick={() => {setVideoURL(video.videoUrl) ; setQuizBtn(false)}} style={{textDecoration:"none"}}><Video title={video.videoTitle} thumbnail={video.videoImage}
                                                publishedDate={video.videoDatePublished} views={video.videoViews} />                                             
                                                </a></div>
-                                               <div className="play"><a onClick={() => setVideoURL(video.videoUrl)}><img src="./images/play-circle-regular.svg" alt="" /></a></div>
+                                               <div className="play"><a onClick={() => {setVideoURL(video.videoUrl) ; setQuizBtn(false)}}><img src="./images/play-circle-regular.svg" alt="" /></a></div>
                                             </div>)
                             })
                         }

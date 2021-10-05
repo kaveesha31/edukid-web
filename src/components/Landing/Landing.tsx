@@ -1,7 +1,4 @@
-import React, {useEffect, useState} from "react";
-import {SideBar} from "../Common/SideBar/SideBar";
-import firebase from "firebase";
-
+import React from "react";
 
 
 export function Landing() {

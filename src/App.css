@@ -169,3 +169,27 @@ position : absolute;
 .image-girl {
   width: 35rem;
 }
+
+.quiz_btn {
+  display: flex;
+  align-items: center;
+  border-radius: 5px;
+
+}
+
+.quiz_btn span {
+  margin-left: 15px;
+  font-weight: 700;
+}
+
+.quiz_btn:hover {
+  cursor: pointer;
+}
+.quiz_section button{
+  border-radius:5px;
+  border: none;
+  background:none;
+}
+.quiz_bt_area a{
+  text-decoration: none ;
+}
