@@ -54,7 +54,7 @@ export function StudentList() {
     const currentPath = window.location.pathname;
     const tId = currentPath.substr(currentPath.indexOf("classrooms/") + 11);
 
-    console.log("tId", tId);
+    console.log("tId", authContext);
 
     useEffect(() => {
         setStudent([]);
@@ -111,6 +111,8 @@ export function StudentList() {
 
         return unsubscriber;
     }, [store]);
+
+    console.log("student", student)
 
     return (
         <div className="class_list">

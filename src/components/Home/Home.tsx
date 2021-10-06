@@ -1,8 +1,10 @@
-import React, {useEffect, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import {SideBar} from "../Common/SideBar/SideBar";
 import firebase from "firebase";
 import {Video} from "../Common/Video/Video";
 import ReactPlayer from 'react-player';
+import { AuthContext } from "../../contexts/userContext";
+import { useHistory } from "react-router";
 
 interface IVideo {
     videDuration : string;
@@ -12,6 +14,7 @@ interface IVideo {
     videoTitle : string;
     videoUrl: string;
     videoViews: number
+    topic: string;
 }
 
 export function Home() {
@@ -23,12 +26,15 @@ export function Home() {
     const username = "user";
     const likeCount = 0;
     const [videoURL, setVideoURL] = useState<string>("");
+    const [videoTopic, setVideoTopic] = useState<string>("");
     const [like, setLike] = useState<boolean>(false);
     const [quizBtn, setQuizBtn] = useState<boolean>(false);
+    const authContext = useContext(AuthContext);
+    const history = useHistory();
     
 
     useEffect(() => {
-        db.collection("videos")
+        db.collection("videos_automated")
             .get()
             .then((querySnapshot) => {
                 let temp : IVideo[] = [];
@@ -57,6 +63,8 @@ export function Home() {
         });
         setFilteredVideos(temp);
     },[search,videos])
+
+    console.log("videoTopic", videoTopic)
 
     
 
@@ -123,12 +131,15 @@ export function Home() {
                         <div className="quiz_section d-flex justify-content-start col-sm">
                             { quizBtn
 
-                                ? <div className="quiz_bt_area"><a href="/quiz" >
+                                ? <div className="quiz_bt_area"><div  onClick={() => {
+                                    history.push(`/quiz/${videoTopic}`);
+                                    
+                                }} >
                                     <div className="quiz_btn" >
                                         <i className="material-icons">quiz</i>
                                         <span>Attempt Quiz</span>
                                     </div>
-                                  </a>
+                                  </div>
                                   </div>
                                 : null
                             }
@@ -140,14 +151,16 @@ export function Home() {
                     }
                     <div className="videos__container">
                         {
-                            filteredVideos.map(video => {
+                            filteredVideos.filter((item : any)=>(
+                                (item.grade === authContext.StudentGrade)
+                            )).map(video => {
                                 
                                 return (<div className="itemsContainer">
                                                 <div className="image">
-                                                <a onClick={() => {setVideoURL(video.videoUrl) ; setQuizBtn(false)}} style={{textDecoration:"none"}}><Video title={video.videoTitle} thumbnail={video.videoImage}
+                                                <a onClick={() => {setVideoTopic(video.videoID); setVideoURL(video.videoUrl) ; setQuizBtn(false)}} style={{textDecoration:"none"}}><Video title={video.videoTitle} thumbnail={video.videoImage}
                                                publishedDate={video.videoDatePublished} views={video.videoViews} />                                             
                                                </a></div>
-                                               <div className="play"><a onClick={() => {setVideoURL(video.videoUrl) ; setQuizBtn(false)}}><img src="./images/play-circle-regular.svg" alt="" /></a></div>
+                                               <div className="play"><a onClick={() => { setVideoTopic(video.videoID); setVideoURL(video.videoUrl); setQuizBtn(false)}}><img src="./images/play-circle-regular.svg" alt="" /></a></div>
                                             </div>)
                             })
                         }

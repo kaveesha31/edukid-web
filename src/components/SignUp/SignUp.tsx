@@ -92,12 +92,12 @@ const MenuProps = {
 };
 
 const grades = [
-  'G-03',
-  'G-04',
-  'G-05',
-  'G-06',
-  'G-07',
-  'G-08',
+  '3',
+  '4',
+  '5',
+  '6',
+  '7',
+  '8',
 ];
 
 function getStyles(name: string, personName: readonly string[], theme: Theme) {
@@ -488,12 +488,12 @@ export function SignUp() {
                 onChange={handleChangestudentGrade}
                 error={user.StudentGradeError ? true : false}
               >
-                <MenuItem value={'G-03'}>G-03</MenuItem>
-                <MenuItem value={'G-04'}>G-04</MenuItem>
-                <MenuItem value={'G-05'}>G-05</MenuItem>
-                <MenuItem value={'G-06'}>G-06</MenuItem>
-                <MenuItem value={'G-07'}>G-07</MenuItem>
-                <MenuItem value={'G-08'}>G-08</MenuItem>
+                <MenuItem value={'3'}>G-03</MenuItem>
+                <MenuItem value={'4'}>G-04</MenuItem>
+                <MenuItem value={'5'}>G-05</MenuItem>
+                <MenuItem value={'6'}>G-06</MenuItem>
+                <MenuItem value={'7'}>G-07</MenuItem>
+                <MenuItem value={'8'}>G-08</MenuItem>
               </Select>
             </FormControl></div> : <div></div>}
             {user.StudentGradeError && <FormHelperText style={{ marginLeft: "20px", color: "#bf0404", fontWeight: "normal" }}>Grade cannot be empty</FormHelperText>}

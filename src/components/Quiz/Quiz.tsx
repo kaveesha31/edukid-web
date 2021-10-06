@@ -1,15 +1,109 @@
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import firebase from "firebase";
-import {SideBar} from "../Common/SideBar/SideBar";
+import { SideBar } from "../Common/SideBar/SideBar";
+import { useFirestore } from "reactfire";
+
+interface IVideo {
+    topic: string;
+}
+
+interface Quiz {
+    uid: string;
+    answer: string;
+    grade: string;
+    options: string[];
+    question: string;
+    topic: string;
+}
+
+const initVideo: IVideo = {
+    topic: ""
+}
 
 
 export function Quiz() {
-  const db = firebase.firestore();
-  const [search, setSearch] = useState<string>("");
-  const username = "user";
+    const db = firebase.firestore();
+    const [search, setSearch] = useState<string>("");
+    const username = "user";
+    const store = useFirestore();
+    const [video, setVideo] = useState(initVideo);
+    const [quiz, setQuiz] = useState<Quiz[]>([]);
 
-  return (
-    <div className="class_list">
+    const currentPath = window.location.pathname;
+    const tId = currentPath.substr(currentPath.indexOf("quiz/") + 5);
+
+    useEffect(() => {
+        return store
+            .collection("videos_automated")
+            .doc(tId)
+            .onSnapshot({}, (change1) => {
+                const data: any = change1.data();
+                setVideo((ps) => ({
+                    ...ps,
+                    ...data,
+                    topic: data.topic
+                }));
+            });
+    }, [store]);
+
+    useEffect(() => {
+        setQuiz([]);
+
+        const unsubscriber = store
+            .collection("quizes")
+            .onSnapshot({}, (snapshot) => {
+                snapshot.docChanges().forEach((change, i) => {
+                    if (change.type === "added") {
+                        setQuiz((ps) => {
+                            if (ps.filter((item) => item.uid === change.doc.id).length <= 0) {
+                                ps.push({
+                                    uid: change.doc.id,
+                                    answer: change.doc.data().answer,
+                                    grade: change.doc.data().grade,
+                                    options: change.doc.data().options,
+                                    question: change.doc.data().question,
+                                    topic: change.doc.data().topic,
+                                });
+                            }
+                            return Object.assign([], ps);
+                        });
+                    }
+                    if (change.type === "modified") {
+                        setQuiz((ps) => {
+                            const modified = ps.map((a) => {
+                                if (a.uid === change.doc.id) {
+                                    return {
+                                        uid: change.doc.id,
+                                        answer: change.doc.data().answer,
+                                        grade: change.doc.data().grade,
+                                        options: change.doc.data().options,
+                                        question: change.doc.data().question,
+                                        topic: change.doc.data().topic,
+                                    };
+                                } else {
+                                    return a;
+                                }
+                            });
+                            return Object.assign([], modified);
+                        });
+                    }
+                    if (change.type === "removed") {
+                        setQuiz((ps) => {
+                            const removed = ps.filter((a) => a.uid !== change.doc.id);
+                            return Object.assign([], removed);
+                        });
+                    }
+                });
+            });
+
+        return unsubscriber;
+    }, [store]);
+
+    console.log("quiz", quiz)
+    console.log("video.topic", video.topic)
+
+    return (
+        <div className="class_list">
             <div className="header">
                 <div className="header__left">
                     <i id="menu" className="material-icons">menu</i>
@@ -18,13 +112,13 @@ export function Quiz() {
                         alt=""
                     />
                     <a href="/">
-                        <img src="logos/logo.png" alt="" style={{width:"50%"}}/>
+                        <img src="logos/logo.png" alt="" style={{ width: "50%" }} />
                     </a>
                 </div>
 
                 <div className="header__search">
                     <form action="">
-                        <input type="text" placeholder="Search" onChange={(e) => {setSearch(e.target.value)}}/>
+                        <input type="text" placeholder="Search" onChange={(e) => { setSearch(e.target.value) }} />
                         <button><i className="material-icons">search</i></button>
                     </form>
                 </div>
@@ -37,16 +131,23 @@ export function Quiz() {
                             <a href="/login">LogOut</a>
                             <p>{username}</p>
                         </div>
-                        </div>
-                    
+                    </div>
+
                 </div>
             </div>
             <div className="mainBody">
-                <SideBar/>
+                <SideBar />
                 <div className="container">
-                    This is quiz
+                    {quiz.filter((item : any) => (
+                        (item.topic === video.topic)
+                    )).map((row:any) => (
+                        <div>
+                        <div>Question = {row.question}</div>
+                        <div>Options = {row.options}</div>
+                        </div>
+                    ))}
                 </div>
             </div>
-    </div>
-  );
+        </div>
+    );
 }

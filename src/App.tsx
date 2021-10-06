@@ -45,7 +45,7 @@ function App() {
           }} exact />
           <Route path="/classrooms/:name" component={StudentList} exact />
           <Route path="/home" component={Home} exact />
-          <Route path="/quiz" component={Quiz} exact />
+          <Route path="/quiz/:id" component={Quiz} exact />
         </Switch>
       </Router>
     </AuthProvider>
