@@ -1,23 +1,121 @@
-import React, {useEffect, useState} from "react";
+import React, { useContext, useEffect, useState } from "react";
 import firebase from "firebase";
-import {SideBar} from "../Common/SideBar/SideBar";
-import {Progress } from 'semantic-ui-react';
+import { SideBar } from "../Common/SideBar/SideBar";
+import { Progress } from 'semantic-ui-react';
+import { useFirestore } from "reactfire";
+import { styled } from '@mui/material/styles';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell, { tableCellClasses } from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
+import { AuthContext } from "../../contexts/userContext";
+
+interface Student {
+    uid: string;
+    userType: string;
+    fullName: string;
+    username: string;
+    email: string;
+    StudentGrade: string;
+    selectedTeacher: string;
+}
+
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+    [`&.${tableCellClasses.head}`]: {
+        backgroundColor: theme.palette.common.black,
+        color: theme.palette.common.white,
+    },
+    [`&.${tableCellClasses.body}`]: {
+        fontSize: 14,
+    },
+}));
+
+const StyledTableRow = styled(TableRow)(({ theme }) => ({
+    '&:nth-of-type(odd)': {
+        backgroundColor: theme.palette.action.hover,
+    },
+    // hide last border
+    '&:last-child td, &:last-child th': {
+        border: 0,
+    },
+}));
 
 export function StudentList() {
-  const db = firebase.firestore();
-  const [search, setSearch] = useState<string>("");
-  const username = "user";
-  const students = [
-    { id: 1, name: "John Smith" },
-    { id: 2, name: "David " },
-    { id: 3, name: "Ann " },
-    { id: 4, name: "Michael" },
-    { id: 5, name: "Watson" }
-  ];
+    const db = firebase.firestore();
+    const [search, setSearch] = useState<string>("");
+    const username = "user";
+    const [student, setStudent] = useState<Student[]>([]);
+    const store = useFirestore();
+    const authContext = useContext(AuthContext);  
+    
+    const currentPath = window.location.pathname;
+    const tId = currentPath.substr(currentPath.indexOf("classrooms/") + 11);
 
+    console.log("tId", authContext);
 
-  return (
-    <div className="class_list">
+    useEffect(() => {
+        setStudent([]);
+
+        const unsubscriber = store
+            .collection("users")
+            .where("userType", "==", "student")
+            .onSnapshot({}, (snapshot) => {
+                snapshot.docChanges().forEach((change, i) => {
+                    if (change.type === "added") {
+                        setStudent((ps) => {
+                            if (ps.filter((item) => item.uid === change.doc.id).length <= 0) {
+                                ps.push({
+                                    uid: change.doc.id,
+                                    email: change.doc.data().email,
+                                    userType: change.doc.data().userType,
+                                    fullName: change.doc.data().fullName,
+                                    username: change.doc.data().username,
+                                    StudentGrade: change.doc.data().StudentGrade,
+                                    selectedTeacher: change.doc.data().selectedTeacher,
+                                });
+                            }
+                            return Object.assign([], ps);
+                        });
+                    }
+                    if (change.type === "modified") {
+                        setStudent((ps) => {
+                            const modified = ps.map((a) => {
+                                if (a.uid === change.doc.id) {
+                                    return {
+                                        uid: change.doc.id,
+                                        email: change.doc.data().email,
+                                        userType: change.doc.data().userType,
+                                        fullName: change.doc.data().fullName,
+                                        username: change.doc.data().username,
+                                        StudentGrade: change.doc.data().StudentGrade,
+                                        selectedTeacher: change.doc.data().selectedTeacher,
+                                    };
+                                } else {
+                                    return a;
+                                }
+                            });
+                            return Object.assign([], modified);
+                        });
+                    }
+                    if (change.type === "removed") {
+                        setStudent((ps) => {
+                            const removed = ps.filter((a) => a.uid !== change.doc.id);
+                            return Object.assign([], removed);
+                        });
+                    }
+                });
+            });
+
+        return unsubscriber;
+    }, [store]);
+
+    console.log("student", student)
+
+    return (
+        <div className="class_list">
             <div className="header">
                 <div className="header__left">
                     <i id="menu" className="material-icons">menu</i>
@@ -26,13 +124,13 @@ export function StudentList() {
                         alt=""
                     />
                     <a href="/">
-                        <img src="logos/logo.png" alt="" style={{width:"50%"}}/>
+                        <img src="logos/logo.png" alt="" style={{ width: "50%" }} />
                     </a>
                 </div>
 
                 <div className="header__search">
                     <form action="">
-                        <input type="text" placeholder="Search" onChange={(e) => {setSearch(e.target.value)}}/>
+                        <input type="text" placeholder="Search" onChange={(e) => { setSearch(e.target.value) }} />
                         <button><i className="material-icons">search</i></button>
                     </form>
                 </div>
@@ -45,43 +143,48 @@ export function StudentList() {
                             <a href="/login">LogOut</a>
                             <p>{username}</p>
                         </div>
-                        </div>
-                    
+                    </div>
+
                 </div>
             </div>
             <div className="mainBody">
-                <SideBar/>
+                <SideBar />
                 <div className="container">
                     <div className="title">
                         <h5>Student List</h5>
                     </div>
-                    <div className="list">
-                        <ul>
-                            {students.map(item => (  
-                            <div className="names">
-                                    <div className="row">
-                                    <div className="col-sm">
-                                        <div className="stname d-flex mt-1 mb-1 align-left">
-                                            <div className="text">
-                                            <li key={item.id}>{item.name}</li>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="col-sm">
-                                        <div className="stpercentage d-flex mt-1 mb-1">
-                                            <div className="text">
-                                                Percentage
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            
-                            </div>
-                            ))}
-                        </ul>
+                    <div>
+                        <TableContainer component={Paper}>
+                            <Table sx={{ minWidth: 700 }} aria-label="customized table">
+                                <TableHead>
+                                    <TableRow>
+                                        <StyledTableCell>Full Name</StyledTableCell>
+                                        <StyledTableCell align="right">Username</StyledTableCell>
+                                        <StyledTableCell align="right">Email</StyledTableCell>
+                                        <StyledTableCell align="right">Grade</StyledTableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                {
+                                        student.filter((item : any)=>(
+                                            (item.selectedTeacher === authContext.uid && item.StudentGrade === tId.toString())
+                                        )).map((row:any) => (
+                                            <StyledTableRow key={row.uid}>
+                                            <StyledTableCell component="th" scope="row">
+                                                {row.fullName}
+                                            </StyledTableCell>
+                                            <StyledTableCell align="right">{row.username}</StyledTableCell>
+                                            <StyledTableCell align="right">{row.email}</StyledTableCell>
+                                            <StyledTableCell align="right">{row.StudentGrade}</StyledTableCell>
+                                        </StyledTableRow>
+                                        ))
+                                    }
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
                     </div>
                 </div>
             </div>
-    </div>
-  );
+        </div>
+    );
 }

@@ -9,7 +9,6 @@ import { SignUp } from "./components/SignUp/SignUp";
 import { ClassRoom } from './components/ClassRoom/ClassRoom';
 import { StudentList } from './components/StudenList/StudentList';
 import { AuthProvider } from "./contexts/userContext";
-import { Landing } from './components/Landing/Landing';
 import { Quiz } from './components/Quiz/Quiz';
 import  {Landing} from "../src/components/Landing/Landing";
 
@@ -46,7 +45,7 @@ function App() {
           }} exact />
           <Route path="/classrooms/:name" component={StudentList} exact />
           <Route path="/home" component={Home} exact />
-          <Route path="/quiz" component={Quiz} exact />
+          <Route path="/quiz/:id" component={Quiz} exact />
         </Switch>
       </Router>
     </AuthProvider>
