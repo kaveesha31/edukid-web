@@ -7,6 +7,7 @@ import { useHistory } from "react-router";
 
 export function ClassRoom() {
     const db = firebase.firestore();
+
     const username = "user";
     const history = useHistory();
 
@@ -29,6 +30,7 @@ export function ClassRoom() {
                         <img src="logos/logo.png" alt="" style={{ width: "50%" }} />
                     </a>
                 </div>
+
 
                 <div className="header__icons">
                     <i className="material-icons">notifications</i>

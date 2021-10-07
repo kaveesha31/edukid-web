@@ -110,6 +110,7 @@ export function StudentList() {
         return unsubscriber;
     }, [store]);
 
+
     console.log("student", student)
 
     return (
@@ -126,7 +127,6 @@ export function StudentList() {
                     </a>
                 </div>
 
-                
 
                 <div className="header__icons">
                     <i className="material-icons">notifications</i>

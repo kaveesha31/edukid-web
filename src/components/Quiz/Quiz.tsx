@@ -147,6 +147,7 @@ export function Quiz() {
                         </div>
                     ))}
                     </div>
+                    
                 </div>
             </div>
         </div>
