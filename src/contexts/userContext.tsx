@@ -31,6 +31,7 @@ type ContextProps = {
     loadingAuthState: boolean;
     userType: string;
     fullName: string;
+    uid: string;
     username: string;
     email: string;
     StudentGrade: string;
@@ -64,6 +65,7 @@ export const AuthProvider = ({ children }: any) => {
           if (change.type === "added" || change.type === "modified") {
             setState((ps) => {
               const userData: any = change.doc.data();
+              const uid = userData.uid;
               const fullName = userData.fullName;
               const email = userData.email;
               const userType = userData.userType;
@@ -74,6 +76,7 @@ export const AuthProvider = ({ children }: any) => {
                 {},
                 {
                   ...ps,
+                  uid,
                   fullName,
                   email,
                   userType,
@@ -97,6 +100,7 @@ export const AuthProvider = ({ children }: any) => {
         setUser,
         loadingAuthState,
         fullName: state.fullName,
+        uid: state.uid,
         email: state.email,
         userType: state.userType,
         username: state.username,

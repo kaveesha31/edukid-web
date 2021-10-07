@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -25,6 +25,7 @@ import { FormHelperText } from "@mui/material";
 import Snackbar from '@mui/material/Snackbar';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
+import { useFirestore } from "reactfire";
 
 interface User {
   uid: string;
@@ -36,6 +37,7 @@ interface User {
   confirmPassword: string;
   StudentGrade: string;
   TeacherGrade: string[];
+  selectedTeacher: string;
   userTypeError: string;
   fullNameError: string;
   usernameError: string;
@@ -44,6 +46,7 @@ interface User {
   confirmPasswordError: string;
   StudentGradeError: string;
   TeacherGradeError: string;
+  selectedTeacherError: string;
 }
 
 const initUer: User = {
@@ -56,6 +59,7 @@ const initUer: User = {
   confirmPassword: "",
   StudentGrade: "",
   TeacherGrade: [],
+  selectedTeacher: "",
   userTypeError: "",
   fullNameError: "",
   usernameError: "",
@@ -64,6 +68,16 @@ const initUer: User = {
   confirmPasswordError: "",
   StudentGradeError: "",
   TeacherGradeError: "",
+  selectedTeacherError: "",
+}
+
+interface Teacher {
+  uid: string;
+  userType: string;
+  fullName: string;
+  username: string;
+  email: string;
+  TeacherGrade: string[];
 }
 
 const ITEM_HEIGHT = 48;
@@ -78,12 +92,12 @@ const MenuProps = {
 };
 
 const grades = [
-  'G-03',
-  'G-04',
-  'G-05',
-  'G-06',
-  'G-07',
-  'G-08',
+  '3',
+  '4',
+  '5',
+  '6',
+  '7',
+  '8',
 ];
 
 function getStyles(name: string, personName: readonly string[], theme: Theme) {
@@ -105,6 +119,64 @@ export function SignUp() {
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = React.useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+  const [teacher, setTeachers] = useState<Teacher[]>([]);
+  const store = useFirestore();
+
+  console.log("user",user)
+
+  useEffect(() => {
+    setTeachers([]);
+
+    const unsubscriber = store
+      .collection("users")
+      .where("userType", "==", "teacher")
+      .onSnapshot({}, (snapshot) => {
+        snapshot.docChanges().forEach((change, i) => {
+          if (change.type === "added") {
+            setTeachers((ps) => {
+              if (ps.filter((item) => item.uid === change.doc.id).length <= 0) {
+                ps.push({
+                  uid: change.doc.data().uid,
+                  email: change.doc.data().email,
+                  userType: change.doc.data().userType,
+                  fullName: change.doc.data().fullName,
+                  username: change.doc.data().username,
+                  TeacherGrade: change.doc.data().TeacherGrade,
+                });
+              }
+              return Object.assign([], ps);
+            });
+          }
+          if (change.type === "modified") {
+            setTeachers((ps) => {
+              const modified = ps.map((a) => {
+                if (a.uid === change.doc.id) {
+                  return {
+                    uid: change.doc.id,
+                    email: change.doc.data().email,
+                    userType: change.doc.data().userType,
+                    fullName: change.doc.data().fullName,
+                    username: change.doc.data().username,
+                    TeacherGrade: change.doc.data().TeacherGrade,
+                  };
+                } else {
+                  return a;
+                }
+              });
+              return Object.assign([], modified);
+            });
+          }
+          if (change.type === "removed") {
+            setTeachers((ps) => {
+              const removed = ps.filter((a) => a.uid !== change.doc.id);
+              return Object.assign([], removed);
+            });
+          }
+        });
+      });
+
+    return unsubscriber;
+  }, [store]);
 
   const handleClick = () => {
     setOpen(true);
@@ -167,11 +239,6 @@ export function SignUp() {
         ? { message: "", isValid: true }
         : { message: "Confirm the password properly", isValid: false };
 
-    const GrdValidation =
-      user.userType === 'student' ? (user.StudentGrade !== ""
-        ? { message: "", isValid: true }
-        : { message: "", isValid: false }) : { message: "", isValid: true }
-
     const typeValidation =
       user.userType !== ""
         ? { message: "", isValid: true }
@@ -181,6 +248,16 @@ export function SignUp() {
       user.userType === 'teacher' ? (teachersGrades.length !== 0
         ? { message: "", isValid: true }
         : { message: "Teachers grades cannot be empty", isValid: false }) : { message: "", isValid: true }
+
+    const selTchrRValidation =
+      user.userType === 'student' ? (user.selectedTeacher !== ""
+        ? { message: "", isValid: true }
+        : { message: "Teacher cannot be empty", isValid: false }) : { message: "", isValid: true }
+
+    const GrdValidation =
+      user.userType === 'student' ? (user.StudentGrade !== ""
+        ? { message: "", isValid: true }
+        : { message: "Grade cannot be empty", isValid: false }) : { message: "", isValid: true }
 
     setUser({
       ...user,
@@ -192,6 +269,7 @@ export function SignUp() {
       StudentGradeError: GrdValidation.message,
       userTypeError: typeValidation.message,
       TeacherGradeError: teacGrdsValidation.message,
+      selectedTeacherError: selTchrRValidation.message,
     });
 
     return (
@@ -202,7 +280,8 @@ export function SignUp() {
       unValidation.isValid &&
       GrdValidation.isValid &&
       typeValidation.isValid &&
-      teacGrdsValidation.isValid
+      teacGrdsValidation.isValid &&
+      selTchrRValidation.isValid
     );
 
   }
@@ -220,6 +299,14 @@ export function SignUp() {
       ...user,
       StudentGrade: event.target.value as string,
       StudentGradeError: "",
+    });
+  };
+
+  const handleChangeSelectedTeacher = (event: SelectChangeEvent) => {
+    setUser({
+      ...user,
+      selectedTeacher: event.target.value as string,
+      selectedTeacherError: "",
     });
   };
 
@@ -253,6 +340,7 @@ export function SignUp() {
             email: user.email,
             StudentGrade: user.StudentGrade,
             TeacherGrade: teachersGrades,
+            selectedTeacher: user.selectedTeacher
           })
             .then((savedUser) => {
               history.push("/login");
@@ -391,6 +479,72 @@ export function SignUp() {
                 });
               }}
             />
+            {user.userType === 'student' ? <div><FormControl variant="outlined" style={{ minWidth: 'calc(100%)', marginTop: "15px" }}>
+              <InputLabel id="demo-simple-select-filled-label">Grade</InputLabel>
+              <Select
+                labelId="demo-simple-select-filled-label"
+                id="demo-simple-select-filled"
+                value={user.StudentGrade}
+                onChange={handleChangestudentGrade}
+                error={user.StudentGradeError ? true : false}
+              >
+                <MenuItem value={'3'}>G-03</MenuItem>
+                <MenuItem value={'4'}>G-04</MenuItem>
+                <MenuItem value={'5'}>G-05</MenuItem>
+                <MenuItem value={'6'}>G-06</MenuItem>
+                <MenuItem value={'7'}>G-07</MenuItem>
+                <MenuItem value={'8'}>G-08</MenuItem>
+              </Select>
+            </FormControl></div> : <div></div>}
+            {user.StudentGradeError && <FormHelperText style={{ marginLeft: "20px", color: "#bf0404", fontWeight: "normal" }}>Grade cannot be empty</FormHelperText>}
+            {
+              user.userType === 'student' ? <div><FormControl variant="outlined" style={{ minWidth: 'calc(100%)', marginTop: "15px" }}>
+                <InputLabel id="demo-simple-select-filled-label">Teacher</InputLabel>
+                <Select
+                  labelId="demo-simple-select-filled-label"
+                  id="demo-simple-select-filled"
+                  value={user.selectedTeacher}
+                  onChange={handleChangeSelectedTeacher}
+                  error={user.selectedTeacherError ? true : false}
+                >
+                  {teacher.map((item: any) => (
+                    <MenuItem value={item.uid}>{item.fullName}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+                {user.selectedTeacherError && <FormHelperText style={{ marginLeft: "20px", color: "#bf0404", fontWeight: "normal" }}>Teacher cannot be empty</FormHelperText>}</div> : <div></div>
+            }
+            {user.userType === 'teacher' ? <div><FormControl style={{ minWidth: 'calc(100%)', marginTop: "15px" }}>
+              <InputLabel id="demo-multiple-chip-label">Teacher's Grades</InputLabel>
+              <Select
+                labelId="demo-multiple-chip-label"
+                id="demo-multiple-chip"
+                multiple
+                value={teachersGrades}
+                onChange={handleChangeTeachersGrades}
+                error={user.TeacherGradeError ? true : false}
+                input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
+                renderValue={(selected: any) => (
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                    {selected.map((value: any) => (
+                      <Chip key={value} label={value} />
+                    ))}
+                  </Box>
+                )}
+                MenuProps={MenuProps}
+              >
+                {grades.map((grade) => (
+                  <MenuItem
+                    key={grade}
+                    value={grade}
+                    style={getStyles(grade, teachersGrades, theme)}
+                  >
+                    {grade}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl></div> : <div></div>}
+            {user.TeacherGradeError && <FormHelperText style={{ marginLeft: "20px", color: "#bf0404", fontWeight: "normal" }}>Teacher's grade cannot be empty</FormHelperText>}
             <TextField
               margin="normal"
               required
@@ -427,55 +581,6 @@ export function SignUp() {
                 });
               }}
             />
-            {user.userType === 'student' ? <div><FormControl variant="outlined" style={{ minWidth: 'calc(100%)', marginTop: "15px" }}>
-              <InputLabel id="demo-simple-select-filled-label">Grade</InputLabel>
-              <Select
-                labelId="demo-simple-select-filled-label"
-                id="demo-simple-select-filled"
-                value={user.StudentGrade}
-                onChange={handleChangestudentGrade}
-                error={user.StudentGradeError ? true : false}
-              >
-                <MenuItem value={'G-03'}>G-03</MenuItem>
-                <MenuItem value={'G-04'}>G-04</MenuItem>
-                <MenuItem value={'G-05'}>G-05</MenuItem>
-                <MenuItem value={'G-06'}>G-06</MenuItem>
-                <MenuItem value={'G-07'}>G-07</MenuItem>
-                <MenuItem value={'G-08'}>G-08</MenuItem>
-              </Select>
-            </FormControl></div> : <div></div>}
-            {user.StudentGradeError && <FormHelperText style={{ marginLeft: "20px", color: "#bf0404", fontWeight: "normal" }}>Grade cannot be empty</FormHelperText>}
-            {user.userType === 'teacher' ? <div><FormControl style={{ minWidth: 'calc(100%)', marginTop: "15px" }}>
-              <InputLabel id="demo-multiple-chip-label">Teacher's Grades</InputLabel>
-              <Select
-                labelId="demo-multiple-chip-label"
-                id="demo-multiple-chip"
-                multiple
-                value={teachersGrades}
-                onChange={handleChangeTeachersGrades}
-                error={user.TeacherGradeError ? true : false}
-                input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
-                renderValue={(selected: any) => (
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                    {selected.map((value: any) => (
-                      <Chip key={value} label={value} />
-                    ))}
-                  </Box>
-                )}
-                MenuProps={MenuProps}
-              >
-                {grades.map((grade) => (
-                  <MenuItem
-                    key={grade}
-                    value={grade}
-                    style={getStyles(grade, teachersGrades, theme)}
-                  >
-                    {grade}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl></div> : <div></div>}
-            {user.TeacherGradeError && <FormHelperText style={{ marginLeft: "20px", color: "#bf0404", fontWeight: "normal" }}>Teacher's grade cannot be empty</FormHelperText>}
             {loading && (
               <div style={{ width: "100%" }}>
                 <LinearProgress color="secondary" />
