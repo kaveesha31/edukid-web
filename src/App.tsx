@@ -11,6 +11,7 @@ import { StudentList } from './components/StudenList/StudentList';
 import { AuthProvider } from "./contexts/userContext";
 import { Quiz } from './components/Quiz/Quiz';
 import  {Landing} from "../src/components/Landing/Landing";
+import AddQuiz from './components/Quiz/addQuiz';
 
 
 const history = createBrowserHistory();
@@ -45,6 +46,7 @@ function App() {
           }} exact />
           <Route path="/classrooms/:name" component={StudentList} exact />
           <Route path="/home" component={Home} exact />
+          <Route path="/addQuiz" component={AddQuiz} exact />
           <Route path="/quiz/:id" component={Quiz} exact />
         </Switch>
       </Router>

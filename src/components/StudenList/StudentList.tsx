@@ -20,6 +20,7 @@ interface Student {
     email: string;
     StudentGrade: string;
     selectedTeacher: string;
+    score : number;
 }
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -73,6 +74,7 @@ export function StudentList() {
                                     username: change.doc.data().username,
                                     StudentGrade: change.doc.data().StudentGrade,
                                     selectedTeacher: change.doc.data().selectedTeacher,
+                                    score: change.doc.data().score ? change.doc.data().score : 0,
                                 });
                             }
                             return Object.assign([], ps);
@@ -154,7 +156,7 @@ export function StudentList() {
                                         <StyledTableCell>Full Name</StyledTableCell>
                                         <StyledTableCell align="right">Username</StyledTableCell>
                                         <StyledTableCell align="right">Email</StyledTableCell>
-                                        <StyledTableCell align="right">Grade</StyledTableCell>
+                                        <StyledTableCell align="right">Score</StyledTableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
@@ -168,7 +170,7 @@ export function StudentList() {
                                             </StyledTableCell>
                                             <StyledTableCell align="right">{row.username}</StyledTableCell>
                                             <StyledTableCell align="right">{row.email}</StyledTableCell>
-                                            <StyledTableCell align="right">{row.StudentGrade}</StyledTableCell>
+                                            <StyledTableCell align="right">{row.score}</StyledTableCell>
                                         </StyledTableRow>
                                         ))
                                     }

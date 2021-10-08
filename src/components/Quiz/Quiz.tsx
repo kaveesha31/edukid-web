@@ -1,7 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import firebase from "firebase";
 import { SideBar } from "../Common/SideBar/SideBar";
 import { useFirestore } from "reactfire";
+import { AuthContext } from "../../contexts/userContext";
+import { useHistory } from "react-router";
 
 interface IVideo {
     topic: string;
@@ -9,17 +11,25 @@ interface IVideo {
 
 interface Quiz {
     uid: string;
-    answer: string;
     grade: string;
-    options: string[];
+    options: Options[];
     question: string;
     topic: string;
+}
+
+interface Options {
+    answerText: string;
+    isCorrect: boolean;
 }
 
 const initVideo: IVideo = {
     topic: ""
 }
 const i = 0;
+
+interface Ans {
+    ans: string
+}
 
 
 export function Quiz() {
@@ -28,9 +38,33 @@ export function Quiz() {
     const store = useFirestore();
     const [video, setVideo] = useState(initVideo);
     const [quiz, setQuiz] = useState<Quiz[]>([]);
+    const [givenAnswer, setGiverAnswer] = useState<Ans[]>([]);
+    const authContext = useContext(AuthContext);
 
     const currentPath = window.location.pathname;
     const tId = currentPath.substr(currentPath.indexOf("quiz/") + 5);
+    const [currentQuestion, setCurrentQuestion] = useState(0);
+    const [showScore, setShowScore] = useState(false);
+    const [score, setScore] = useState(0);
+    const [finish, setFinish] = useState(false);
+    const history = useHistory();
+
+    console.log("score", score);
+
+    const handleAnswerOptionClick = (isCorrect: any) => {
+        if (isCorrect) {
+            setScore(score + 1);
+        }
+
+        const nextQuestion = currentQuestion + 1;
+        if (nextQuestion < quiz.length) {
+            setCurrentQuestion(nextQuestion);
+        } else {
+            setShowScore(true);
+        }
+    };
+
+    console.log("givenAnswer", givenAnswer);
 
     useEffect(() => {
         return store
@@ -47,10 +81,15 @@ export function Quiz() {
     }, [store]);
 
     useEffect(() => {
+        quiz.length === 0 ? setFinish(true) : setFinish(false);
+    }, [quiz.length])
+
+    useEffect(() => {
         setQuiz([]);
 
         const unsubscriber = store
             .collection("quizes")
+            // .where("topic", "==", video && video.topic)
             .onSnapshot({}, (snapshot) => {
                 snapshot.docChanges().forEach((change, i) => {
                     if (change.type === "added") {
@@ -58,7 +97,7 @@ export function Quiz() {
                             if (ps.filter((item) => item.uid === change.doc.id).length <= 0) {
                                 ps.push({
                                     uid: change.doc.id,
-                                    answer: change.doc.data().answer,
+                                    // answer: change.doc.data().answer,
                                     grade: change.doc.data().grade,
                                     options: change.doc.data().options,
                                     question: change.doc.data().question,
@@ -74,7 +113,7 @@ export function Quiz() {
                                 if (a.uid === change.doc.id) {
                                     return {
                                         uid: change.doc.id,
-                                        answer: change.doc.data().answer,
+                                        // answer: change.doc.data().answer,
                                         grade: change.doc.data().grade,
                                         options: change.doc.data().options,
                                         question: change.doc.data().question,
@@ -99,57 +138,64 @@ export function Quiz() {
         return unsubscriber;
     }, [store]);
 
+    const updateUserInFirestore = (userFirestore: any) => {
+        store
+            .collection("users")
+            .where("uid", "==", authContext.user && authContext.user.uid)
+            .get()
+            .then(async (userQS) => {
+                return await userQS.docs[0].ref.set(userFirestore, { merge: true });
+            })
+            .catch((errorUpdatingUser) => {
+                throw new Error(errorUpdatingUser.message);
+            })
+    };
+
     console.log("quiz", quiz)
     console.log("video.topic", video.topic)
+    console.log("finish", finish)
 
     return (
-        <div className="class_list">
-            <div className="header">
-                <div className="header__left">
-                    <i id="menu" className="material-icons">menu</i>
-                    <img
-                        src="https://www.youtube.com/about/static/svgs/icons/brand-resources/YouTube-logo-full_color_light.svg?cache=72a5d9c"
-                        alt=""
-                    />
-                    <a href="/">
-                        <img src="logos/logo.png" alt="" style={{ width: "50%" }} />
-                    </a>
-                </div>
-
-               
-
-                <div className="header__icons">
-                    <i className="material-icons">notifications</i>
-                    <div className="dropdown">
-                        <button className="dropbtn"><i className="material-icons display-this">account_circle</i></button>
-                        <div className="dropdown-content">
-                            <a href="/login">LogOut</a>
-                            <p>{username}</p>
+        <div>
+            {quiz.length > 0 && <div className='app'>
+                {showScore ? (
+                    <div style={{ textAlign: "center" }}>
+                        <div className='score-section'>
+                            You scored {score} out of {quiz.length}
                         </div>
+                        <button onClick={(e: any) => {
+                            e.preventDefault();
+                            updateUserInFirestore({
+                                score: score,
+                            })
+                            history.push("/home")
+                        }}>Done</button>
                     </div>
-
-                </div>
-            </div>
-            <div className="mainBody">
-                <SideBar />
-                <div className="container">
-                    <div className="quiz_list m-4">
-                    {quiz.filter((item : any) => (
-                        (item.topic === video.topic)
-                    )).map((row:any) => (
-                        <div>
-                        <div>{row.question}</div>
-                        {row.options.map((opt:any) =>(
-                            <div className="ml-3">{opt}</div>
-                        ))}
-                        <div className="answer_area ml-6">Answer : <input type="text"/></div>
-                        <br /><br />
+                ) : (
+                    <>
+                        <div style={{ textAlign: "center" }} className='question-section'>
+                            <div className='question-count'>
+                                <span>Question {currentQuestion + 1}</span>/{quiz.length}
+                            </div>
+                            <br />
+                            <div className='question-text'>{quiz[currentQuestion].question}</div>
                         </div>
-                    ))}
-                    </div>
-                    
-                </div>
-            </div>
+                        <br />
+                        <div className='answer-section'>
+                            <br />
+                            {/* {quiz.filter((item : any)=>(
+                                            (item.topic === video.topic)
+                                        ))} */}
+                            {quiz[currentQuestion].options.map((answerOption) => (
+                                <div style={{ textAlign: "center" }}>
+                                    <br />
+                                    <button onClick={() => handleAnswerOptionClick(answerOption.isCorrect)}>{answerOption.answerText}</button>
+                                </div>
+                            ))}
+                        </div>
+                    </>
+                )}
+            </div>}
         </div>
     );
 }
