@@ -113,7 +113,7 @@ export function Login() {
 
   const handleLogin = () => {
     setUser({ ...user, loading: true });
-    console.log("authContext", authContext)
+    console.log("authContext", authContext.userType)
 
     fire
       .auth()
@@ -130,11 +130,9 @@ export function Login() {
           sessionStorage.setItem("isAuthed", "true");
           localStorage.setItem("isAuthed", "false");
         }
-        if(authContext.userType === "teacher"){
-          history.push("/classrooms");
-        } else {
-          history.push("/home");
-        }
+        
+        history.push("/welcome")
+
       })
       .catch((err) => {
         switch (err.code) {

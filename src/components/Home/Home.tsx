@@ -27,7 +27,9 @@ export function Home() {
     const likeCount = 0;
     const [videoURL, setVideoURL] = useState<string>("");
     const [videoTopic, setVideoTopic] = useState<string>("");
+    const [Topic, setTopic] = useState<string>("");
     const [like, setLike] = useState<boolean>(false);
+    const [unLike, setUnLike] = useState<boolean>(false);
     const [quizBtn, setQuizBtn] = useState<boolean>(false);
     const authContext = useContext(AuthContext);
     const history = useHistory();
@@ -48,7 +50,7 @@ export function Home() {
             .catch((error) => {
                 // console.log("Error getting documents: ", error);
             });
-    },[db])
+    },[db]) 
 
     useEffect(() => {
         let temp : IVideo[] = [];
@@ -64,7 +66,7 @@ export function Home() {
         setFilteredVideos(temp);
     },[search,videos])
 
-    console.log("videoTopic", videoTopic)
+    console.log("videoTopic", Topic)
 
     
 
@@ -127,12 +129,30 @@ export function Home() {
                                     </div>
                             }
                         </div>
+                        <div className="like_section d-flex justify-content-start col-sm">
+                        { unLike
+                                ? <div><button onClick={() => setUnLike(!like)} style={{borderRadius:'5px'}}>
+                                    <div className="like_btn" >
+                                        <i className="material-icons"  style={{color:'#0571ed'}}>thumb_down</i>
+                                        <span  style={{color:'#0571ed'}}>Un Liked</span>
+                                    </div>
+                                  </button>
+                                  </div>
+                                : <div><button onClick={() => setUnLike(!like)}>
+                                    <div className="like_btn">
+                                        <i className="material-icons" >thumb_down</i>
+                                        <span>Un Like</span>
+                                    </div>
+                                    </button>
+                                    </div>
+                            }
+                        </div>
 
                         <div className="quiz_section d-flex justify-content-start col-sm">
                             { quizBtn
 
                                 ? <div className="quiz_bt_area"><div  onClick={() => {
-                                    history.push(`/quiz/${videoTopic}`);
+                                    history.push(`/quiz/${Topic}`);
                                     
                                 }} >
                                     <div className="quiz_btn" >
@@ -157,10 +177,10 @@ export function Home() {
                                 
                                 return (<div className="itemsContainer">
                                                 <div className="image">
-                                                <a onClick={() => {setVideoTopic(video.videoID); setVideoURL(video.videoUrl) ; setQuizBtn(false)}} style={{textDecoration:"none"}}><Video title={video.videoTitle} thumbnail={video.videoImage}
+                                                <a onClick={() => {setVideoTopic(video.videoID); setVideoURL(video.videoUrl); setTopic(video.topic); setQuizBtn(false)}} style={{textDecoration:"none"}}><Video title={video.videoTitle} thumbnail={video.videoImage}
                                                publishedDate={video.videoDatePublished} views={video.videoViews} />                                             
                                                </a></div>
-                                               <div className="play"><a onClick={() => { setVideoTopic(video.videoID); setVideoURL(video.videoUrl); setQuizBtn(false)}}><img src="./images/play-circle-regular.svg" alt="" /></a></div>
+                                               <div className="play"><a onClick={() => { setVideoTopic(video.videoID);  setTopic(video.topic); setVideoURL(video.videoUrl); setQuizBtn(false)}}><img src="./images/play-circle-regular.svg" alt="" /></a></div>
                                             </div>)
                             })
                         }

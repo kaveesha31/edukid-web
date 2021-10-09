@@ -4,6 +4,7 @@ import { SideBar } from "../Common/SideBar/SideBar";
 import { useFirestore } from "reactfire";
 import { AuthContext } from "../../contexts/userContext";
 import { useHistory } from "react-router";
+import { Item } from "semantic-ui-react";
 
 interface IVideo {
     topic: string;
@@ -42,12 +43,19 @@ export function Quiz() {
     const authContext = useContext(AuthContext);
 
     const currentPath = window.location.pathname;
-    const tId = currentPath.substr(currentPath.indexOf("quiz/") + 5);
+    var tId = "";
     const [currentQuestion, setCurrentQuestion] = useState(0);
     const [showScore, setShowScore] = useState(false);
     const [score, setScore] = useState(0);
     const [finish, setFinish] = useState(false);
     const history = useHistory();
+    var nums: any[] = [];
+
+    useEffect(()=>{
+        const currentPathUE = window.location.pathname;
+        const tIdUE = currentPath.substr(currentPathUE.indexOf("quiz/") + 5);
+        tId = tIdUE;
+    })
 
     console.log("score", score);
 
@@ -80,16 +88,20 @@ export function Quiz() {
             });
     }, [store]);
 
+    console.log("t", video.topic);
+
     useEffect(() => {
         quiz.length === 0 ? setFinish(true) : setFinish(false);
     }, [quiz.length])
+
+    const ddd = video.topic;
 
     useEffect(() => {
         setQuiz([]);
 
         const unsubscriber = store
             .collection("quizes")
-            // .where("topic", "==", video && video.topic)
+            .where("topic", "==", tId && tId)
             .onSnapshot({}, (snapshot) => {
                 snapshot.docChanges().forEach((change, i) => {
                     if (change.type === "added") {
@@ -151,6 +163,17 @@ export function Quiz() {
             })
     };
 
+    useEffect(() => {
+        nums = quiz.filter((item: any) => {
+            if (item.topic === video.topic) {
+                nums.push(item);
+                return nums
+            }
+        })
+    })
+
+    console.log("nums", nums);
+
     console.log("quiz", quiz)
     console.log("video.topic", video.topic)
     console.log("finish", finish)
@@ -179,14 +202,12 @@ export function Quiz() {
                             </div>
                             <br />
                             <div className='question-text'>{quiz[currentQuestion].question}</div>
+                            {console.log("quiz[currentQuestion].question", quiz[currentQuestion].question)}
                         </div>
                         <br />
                         <div className='answer-section'>
                             <br />
-                            {/* {quiz.filter((item : any)=>(
-                                            (item.topic === video.topic)
-                                        ))} */}
-                            {quiz[currentQuestion].options.map((answerOption) => (
+                            {quiz[currentQuestion].options.map((answerOption: any) => (
                                 <div style={{ textAlign: "center" }}>
                                     <br />
                                     <button onClick={() => handleAnswerOptionClick(answerOption.isCorrect)}>{answerOption.answerText}</button>

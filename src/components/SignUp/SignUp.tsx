@@ -507,7 +507,9 @@ export function SignUp() {
                   onChange={handleChangeSelectedTeacher}
                   error={user.selectedTeacherError ? true : false}
                 >
-                  {teacher.map((item: any) => (
+                  {teacher.filter((f:any)=>(
+                    f.TeacherGrade.includes(user.StudentGrade)
+                  )).map((item: any) => (
                     <MenuItem value={item.uid}>{item.fullName}</MenuItem>
                   ))}
                 </Select>
