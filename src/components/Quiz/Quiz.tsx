@@ -43,19 +43,13 @@ export function Quiz() {
     const authContext = useContext(AuthContext);
 
     const currentPath = window.location.pathname;
-    var tId = "";
+    const tId = currentPath.substr(currentPath.indexOf("quiz/") + 5);
     const [currentQuestion, setCurrentQuestion] = useState(0);
     const [showScore, setShowScore] = useState(false);
     const [score, setScore] = useState(0);
     const [finish, setFinish] = useState(false);
     const history = useHistory();
     var nums: any[] = [];
-
-    useEffect(()=>{
-        const currentPathUE = window.location.pathname;
-        const tIdUE = currentPath.substr(currentPathUE.indexOf("quiz/") + 5);
-        tId = tIdUE;
-    })
 
     console.log("score", score);
 
@@ -94,14 +88,12 @@ export function Quiz() {
         quiz.length === 0 ? setFinish(true) : setFinish(false);
     }, [quiz.length])
 
-    const ddd = video.topic;
-
     useEffect(() => {
         setQuiz([]);
 
         const unsubscriber = store
             .collection("quizes")
-            .where("topic", "==", tId && tId)
+            // .where("topic", "==", video.topic)
             .onSnapshot({}, (snapshot) => {
                 snapshot.docChanges().forEach((change, i) => {
                     if (change.type === "added") {
