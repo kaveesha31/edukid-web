@@ -66,7 +66,7 @@ export function Home() {
         setFilteredVideos(temp);
     },[search,videos])
 
-    console.log("videoTopic", Topic)
+    console.log("videoTopic", videoTopic)
 
     
 
@@ -152,7 +152,7 @@ export function Home() {
                             { quizBtn
 
                                 ? <div className="quiz_bt_area"><div  onClick={() => {
-                                    history.push(`/quiz/${Topic}`);
+                                    history.push(`/quiz/${videoTopic}`);
                                     
                                 }} >
                                     <div className="quiz_btn" >

@@ -44,7 +44,6 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 }));
 
 export function StudentList() {
-    const db = firebase.firestore();
     const username = "user";
     const [student, setStudent] = useState<Student[]>([]);
     const store = useFirestore();
@@ -52,8 +51,6 @@ export function StudentList() {
     
     const currentPath = window.location.pathname;
     const tId = currentPath.substr(currentPath.indexOf("classrooms/") + 11);
-
-    console.log("tId", authContext);
 
     useEffect(() => {
         setStudent([]);
@@ -162,7 +159,7 @@ export function StudentList() {
                                 <TableBody>
                                 {
                                         student.filter((item : any)=>(
-                                            (item.selectedTeacher === authContext.uid && item.StudentGrade === tId.toString())
+                                            (item.selectedTeacher === authContext.uid && item.StudentGrade === tId)
                                         )).map((row:any) => (
                                             <StyledTableRow key={row.uid}>
                                             <StyledTableCell component="th" scope="row">
@@ -170,7 +167,7 @@ export function StudentList() {
                                             </StyledTableCell>
                                             <StyledTableCell align="right">{row.username}</StyledTableCell>
                                             <StyledTableCell align="right">{row.email}</StyledTableCell>
-                                            <StyledTableCell align="right">{row.score}</StyledTableCell>
+                                            <StyledTableCell align="right">{row.score}/10</StyledTableCell>
                                         </StyledTableRow>
                                         ))
                                     }

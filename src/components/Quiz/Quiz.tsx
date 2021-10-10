@@ -1,10 +1,8 @@
 import React, { useContext, useEffect, useState } from "react";
 import firebase from "firebase";
-import { SideBar } from "../Common/SideBar/SideBar";
 import { useFirestore } from "reactfire";
 import { AuthContext } from "../../contexts/userContext";
 import { useHistory } from "react-router";
-import { Item } from "semantic-ui-react";
 
 interface IVideo {
     topic: string;
@@ -35,11 +33,8 @@ interface Ans {
 
 export function Quiz() {
     const db = firebase.firestore();
-    const username = "user";
     const store = useFirestore();
     const [video, setVideo] = useState(initVideo);
-    const [quiz, setQuiz] = useState<Quiz[]>([]);
-    const [givenAnswer, setGiverAnswer] = useState<Ans[]>([]);
     const authContext = useContext(AuthContext);
 
     const currentPath = window.location.pathname;
@@ -47,11 +42,7 @@ export function Quiz() {
     const [currentQuestion, setCurrentQuestion] = useState(0);
     const [showScore, setShowScore] = useState(false);
     const [score, setScore] = useState(0);
-    const [finish, setFinish] = useState(false);
     const history = useHistory();
-    var nums: any[] = [];
-
-    console.log("score", score);
 
     const handleAnswerOptionClick = (isCorrect: any) => {
         if (isCorrect) {
@@ -59,14 +50,12 @@ export function Quiz() {
         }
 
         const nextQuestion = currentQuestion + 1;
-        if (nextQuestion < quiz.length) {
+        if (nextQuestion < filteredQuiz.length) {
             setCurrentQuestion(nextQuestion);
         } else {
             setShowScore(true);
         }
     };
-
-    console.log("givenAnswer", givenAnswer);
 
     useEffect(() => {
         return store
@@ -77,70 +66,46 @@ export function Quiz() {
                 setVideo((ps) => ({
                     ...ps,
                     ...data,
-                    topic: data.topic
+                    topic: data.classified_topic
                 }));
             });
-    }, [store]);
+    }, [store,tId]);
 
     console.log("t", video.topic);
 
-    useEffect(() => {
-        quiz.length === 0 ? setFinish(true) : setFinish(false);
-    }, [quiz.length])
+    const [q, setQ] = useState<Quiz[]>([]);
+    const [filteredQuiz, setFilteredQuiz] = useState<Quiz[]>([]);
 
     useEffect(() => {
-        setQuiz([]);
-
-        const unsubscriber = store
-            .collection("quizes")
-            // .where("topic", "==", video.topic)
-            .onSnapshot({}, (snapshot) => {
-                snapshot.docChanges().forEach((change, i) => {
-                    if (change.type === "added") {
-                        setQuiz((ps) => {
-                            if (ps.filter((item) => item.uid === change.doc.id).length <= 0) {
-                                ps.push({
-                                    uid: change.doc.id,
-                                    // answer: change.doc.data().answer,
-                                    grade: change.doc.data().grade,
-                                    options: change.doc.data().options,
-                                    question: change.doc.data().question,
-                                    topic: change.doc.data().topic,
-                                });
-                            }
-                            return Object.assign([], ps);
-                        });
-                    }
-                    if (change.type === "modified") {
-                        setQuiz((ps) => {
-                            const modified = ps.map((a) => {
-                                if (a.uid === change.doc.id) {
-                                    return {
-                                        uid: change.doc.id,
-                                        // answer: change.doc.data().answer,
-                                        grade: change.doc.data().grade,
-                                        options: change.doc.data().options,
-                                        question: change.doc.data().question,
-                                        topic: change.doc.data().topic,
-                                    };
-                                } else {
-                                    return a;
-                                }
-                            });
-                            return Object.assign([], modified);
-                        });
-                    }
-                    if (change.type === "removed") {
-                        setQuiz((ps) => {
-                            const removed = ps.filter((a) => a.uid !== change.doc.id);
-                            return Object.assign([], removed);
-                        });
-                    }
+        db.collection("quizes")
+            .get()
+            .then((querySnapshot) => {
+                let temp : Quiz[] = [];
+                querySnapshot.forEach((doc) => {
+                    let video : Quiz  = doc.data() as Quiz;
+                    temp.push(video);
                 });
+                setQ(temp);
+                setFilteredQuiz(temp);
+            })
+            .catch((error) => {
+                // console.log("Error getting documents: ", error);
             });
+    },[db]) 
 
-        return unsubscriber;
-    }, [store]);
+    useEffect(() => {
+        let temp : Quiz[] = [];
+        q.map(quiz => {
+            if(quiz.topic === video.topic) {
+                temp.push(quiz);
+            }
+
+            return () => {
+                // none
+            }
+        });
+        setFilteredQuiz(temp);
+    },[video,q])
 
     const updateUserInFirestore = (userFirestore: any) => {
         store
@@ -155,28 +120,15 @@ export function Quiz() {
             })
     };
 
-    useEffect(() => {
-        nums = quiz.filter((item: any) => {
-            if (item.topic === video.topic) {
-                nums.push(item);
-                return nums
-            }
-        })
-    })
-
-    console.log("nums", nums);
-
-    console.log("quiz", quiz)
-    console.log("video.topic", video.topic)
-    console.log("finish", finish)
+    console.log("filteredQuiz", filteredQuiz);
 
     return (
         <div>
-            {quiz.length > 0 && <div className='app'>
+            {filteredQuiz.length > 0 && <div className='app'>
                 {showScore ? (
                     <div style={{ textAlign: "center" }}>
                         <div className='score-section'>
-                            You scored {score} out of {quiz.length}
+                            You scored {score} out of {filteredQuiz.length}
                         </div>
                         <button onClick={(e: any) => {
                             e.preventDefault();
@@ -190,16 +142,16 @@ export function Quiz() {
                     <>
                         <div style={{ textAlign: "center" }} className='question-section'>
                             <div className='question-count'>
-                                <span>Question {currentQuestion + 1}</span>/{quiz.length}
+                                <span>Question {currentQuestion + 1}</span>/{filteredQuiz.length}
                             </div>
                             <br />
-                            <div className='question-text'>{quiz[currentQuestion].question}</div>
-                            {console.log("quiz[currentQuestion].question", quiz[currentQuestion].question)}
+                            <div className='question-text'>{filteredQuiz[currentQuestion].question}</div>
+                            {console.log("quiz[currentQuestion].question", filteredQuiz[currentQuestion].question)}
                         </div>
                         <br />
                         <div className='answer-section'>
                             <br />
-                            {quiz[currentQuestion].options.map((answerOption: any) => (
+                            {filteredQuiz[currentQuestion].options.map((answerOption: any) => (
                                 <div style={{ textAlign: "center" }}>
                                     <br />
                                     <button onClick={() => handleAnswerOptionClick(answerOption.isCorrect)}>{answerOption.answerText}</button>
