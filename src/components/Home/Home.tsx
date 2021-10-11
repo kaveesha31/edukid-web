@@ -15,6 +15,8 @@ interface IVideo {
     videoUrl: string;
     videoViews: number
     topic: string;
+    classified_topic : string;
+    ranking_score : number;
 }
 
 export function Home() {
@@ -31,7 +33,6 @@ export function Home() {
     const [quizBtn, setQuizBtn] = useState<boolean>(false);
     const authContext = useContext(AuthContext);
     const history = useHistory();
-    
 
     useEffect(() => {
         db.collection("videos_automated")
@@ -53,7 +54,8 @@ export function Home() {
     useEffect(() => {
         let temp : IVideo[] = [];
         videos.map(video => {
-            if(video.videoTitle.toLowerCase().includes(search.toLowerCase())) {
+            if(video.videoTitle.toLowerCase().includes(search.toLowerCase()) ||
+                video.classified_topic.toLowerCase().includes(search.toLowerCase())) {
                 temp.push(video);
             }
 
@@ -61,13 +63,14 @@ export function Home() {
                 // none
             }
         });
+
+        // sort by ranking score in descending order
+        temp.sort((a,b) => {return (b.ranking_score - a.ranking_score)});
+
         setFilteredVideos(temp);
     },[search,videos])
 
     console.log("videoTopic", videoTopic)
-
-    
-
 
     return (
         <>
