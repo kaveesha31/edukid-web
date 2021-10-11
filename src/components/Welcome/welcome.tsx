@@ -11,12 +11,12 @@ const Welcome = () => {
 
   return (
     <div className="intro">
-    <div className="black"></div>  
-    <div className="white"></div>
+    <div className="black">{}</div>
+    <div className="white">{}</div>
     <div className="boxfather">
       <div className="box">
         <h1>WELCOME</h1>
-        <button  onClick={(e: any) => {
+        <button  onClick={() => {
                 if(authContext.userType === "teacher"){
                     history.push("/classrooms")
                 } else {

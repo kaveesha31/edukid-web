@@ -59,7 +59,7 @@
   background:#E4E4E4;
   transition:all .3s ease;
   font-size: 19px;
-  font-family: montserrat;
+  font-family: montserrat, sans-serif;
   border-radius:5px;
 }
 .homepage{
@@ -73,7 +73,7 @@
   width: 80%;
   line-height: 1.5;
   margin:50px auto;
-  font-family: oxygen;
+  font-family: oxygen, sans-serif;
   font-size: 18px;
   color: #585858;
 }
@@ -81,7 +81,7 @@
   padding-top: 50px;
   width: 80%;
   margin:auto;
-  font-family: montserrat;
+  font-family: montserrat, sans-serif;
   color: #525252;
   font-size: 40px;
 }

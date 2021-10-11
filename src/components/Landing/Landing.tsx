@@ -1,6 +1,5 @@
 import React from "react";
 
-
 export function Landing() {
 
     return (
@@ -9,14 +8,14 @@ export function Landing() {
                 <div className="header__left">
                     
                     <a href="/">
-                        <img src="logos/logo.png" alt="" style={{width:"50%"}}/>
+                        <img src={"logos/logo.png"} alt="" style={{width:"50%"}}/>
                     </a>
                 </div>
 
                 <div className="header__icons">
                     <div className="icons">
-                        <a href="/login" className="home_nav"><i className="material-icons">login</i>Login</a>
-                        <a href="/signup" className="home_nav"><i className="material-icons">how_to_reg</i>SignUp</a>
+                        <a href={"/login"} className="home_nav"><i className="material-icons">login</i>Login</a>
+                        <a href={"/signup"} className="home_nav"><i className="material-icons">how_to_reg</i>SignUp</a>
                     </div>
                     
                 </div>
@@ -27,7 +26,7 @@ export function Landing() {
                             <div className="col-sm">
                                 <div className="d-flex justify-content-center mt-4 mb-1 align-middle">
                                     <div className="image">
-                                        <img className="image-girl" src="\images\girl2.webp" alt=""/>
+                                        <img className="image-girl" src={"\\images\\girl2.webp"} alt=""/>
                                     </div>
                                 </div>
                             </div>

@@ -1,20 +1,17 @@
-import React, { useEffect, useState } from "react";
-import firebase from "firebase";
+import React from "react";
 import { SideBar } from "../Common/SideBar/SideBar";
 import fire from "../../config/firebaseConfig";
 import { useHistory } from "react-router";
 
-
 export function ClassRoom() {
-    const db = firebase.firestore();
 
     const username = "user";
     const history = useHistory();
 
-    const handleLogOut = () => {
+    const handleLogOut = async () => {
         sessionStorage.setItem("isAuthed", "false");
         localStorage.setItem("isAuthed", "false");
-        fire.auth().signOut();
+        await fire.auth().signOut();
     };
 
     return (
@@ -27,7 +24,7 @@ export function ClassRoom() {
                         alt=""
                     />
                     <a href="/">
-                        <img src="logos/logo.png" alt="" style={{ width: "50%" }} />
+                        <img src={"logos/logo.png"} alt="" style={{ width: "50%" }} />
                     </a>
                 </div>
 
@@ -37,8 +34,8 @@ export function ClassRoom() {
                     <div className="dropdown">
                         <button className="dropbtn"><i className="material-icons display-this">account_circle</i></button>
                         <div className="dropdown-content">
-                            <div onClick={() => {
-                                handleLogOut();
+                            <div onClick={ async () => {
+                                await handleLogOut();
                                 history.push("/login");
                             }}>Logout</div>
                             <p>{username}</p>
@@ -52,7 +49,7 @@ export function ClassRoom() {
                 <div className="container">
                     <div className="row">
                         <div className="col-sm">
-                            <a href="/classrooms/3">
+                            <a href={"/classrooms/3"}>
                                 <div className="class_name d-flex justify-content-center mt-1 mb-1 align-middle">
                                     <div className="text">
                                         Grade 03
@@ -61,7 +58,7 @@ export function ClassRoom() {
                             </a>
                         </div>
                         <div className="col-sm">
-                            <a href="/classrooms/4">
+                            <a href={"/classrooms/4"}>
                                 <div className="class_name d-flex justify-content-center mt-1 mb-1 align-middle">
                                     <div className="text">
                                         Grade 04
@@ -70,7 +67,7 @@ export function ClassRoom() {
                             </a>
                         </div>
                         <div className="col-sm">
-                            <a href="/classrooms/5">
+                            <a href={"/classrooms/5"}>
                                 <div className="class_name d-flex justify-content-center mt-1 mb-1 align-middle">
                                     <div className="text">
                                         Grade 05
@@ -81,7 +78,7 @@ export function ClassRoom() {
                     </div>
                     <div className="row">
                         <div className="col-sm">
-                            <a href="/classrooms/6">
+                            <a href={"/classrooms/6"}>
                                 <div className="class_name d-flex justify-content-center mt-1 mb-1 align-middle">
                                     <div className="text">
                                         Grade 06
@@ -90,7 +87,7 @@ export function ClassRoom() {
                             </a>
                         </div>
                         <div className="col-sm">
-                            <a href="/classrooms/7">
+                            <a href={"/classrooms/7"}>
                                 <div className="class_name d-flex justify-content-center mt-1 mb-1 align-middle">
                                     <div className="text">
                                         Grade 07
@@ -99,7 +96,7 @@ export function ClassRoom() {
                             </a>
                         </div>
                         <div className="col-sm">
-                            <a href="/classrooms/8">
+                            <a href={"/classrooms/8"}>
                                 <div className="class_name d-flex justify-content-center mt-1 mb-1 align-middle">
                                     <div className="text">
                                         Grade 08
@@ -111,7 +108,7 @@ export function ClassRoom() {
 
                     <div className="row">
                         <div className="col-sm">
-                            <a href="/classrooms/9">
+                            <a href={"/classrooms/9"}>
                                 <div className="class_name d-flex justify-content-center mt-1 mb-1 align-middle">
                                     <div className="text">
                                         Grade 09
@@ -120,7 +117,7 @@ export function ClassRoom() {
                             </a>
                         </div>
                         <div className="col-sm">
-                            <a href="/classrooms/10">
+                            <a href={"/classrooms/10"}>
                                 <div className="class_name d-flex justify-content-center mt-1 mb-1 align-middle">
                                     <div className="text">
                                         Grade 10
@@ -129,7 +126,7 @@ export function ClassRoom() {
                             </a>
                         </div>
                         <div className="col-sm">
-                            <a href="/classrooms/11">
+                            <a href={"/classrooms/11"}>
                                 <div className="class_name d-flex justify-content-center mt-1 mb-1 align-middle">
                                     <div className="text">
                                         Grade 11

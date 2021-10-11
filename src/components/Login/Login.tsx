@@ -21,7 +21,6 @@ import fire from "../../config/firebaseConfig";
 import { IconButton, LinearProgress, Snackbar } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 
-
 interface User {
   uid: string;
   email: string;
@@ -58,7 +57,6 @@ export function Login() {
   const [open, setOpen] = React.useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
-  
   console.log("userType", authContext.userType)
 
   const handleClick = () => {
@@ -183,7 +181,7 @@ export function Login() {
           </Typography>
           <Box component="form" noValidate sx={{ mt: 1 }}>
           <TextField
-            error={user.emailError ? true : false}
+            error={!!user.emailError}
             helperText={user.emailError}
             variant="outlined"
             margin="normal"
@@ -203,7 +201,7 @@ export function Login() {
             }}
           />
           <TextField
-            error={user.passwordError ? true : false}
+            error={!!user.passwordError}
             helperText={user.passwordError}
             variant="outlined"
             margin="normal"
@@ -253,7 +251,7 @@ export function Login() {
             </Button>
             <Grid container>
                <Grid item>
-                <Link href="/signup" variant="body2">
+                <Link href={"/signup"} variant="body2">
                   {"Don't have an account? Sign Up"}
                 </Link>
               </Grid>

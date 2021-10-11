@@ -10,7 +10,7 @@ import { ClassRoom } from './components/ClassRoom/ClassRoom';
 import { StudentList } from './components/StudenList/StudentList';
 import { AuthProvider } from "./contexts/userContext";
 import { Quiz } from './components/Quiz/Quiz';
-import  {Landing} from "../src/components/Landing/Landing";
+import  {Landing} from "./components/Landing/Landing";
 import AddQuiz from './components/Quiz/addQuiz';
 import Welcome from './components/Welcome/welcome';
 

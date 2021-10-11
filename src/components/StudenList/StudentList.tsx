@@ -1,16 +1,15 @@
-import React, { useContext, useEffect, useState } from "react";
-import firebase from "firebase";
-import { SideBar } from "../Common/SideBar/SideBar";
-import { useFirestore } from "reactfire";
-import { styled } from '@mui/material/styles';
+import React, {useContext, useEffect, useState} from "react";
+import {SideBar} from "../Common/SideBar/SideBar";
+import {useFirestore} from "reactfire";
+import {styled} from '@mui/material/styles';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
-import TableCell, { tableCellClasses } from '@mui/material/TableCell';
+import TableCell, {tableCellClasses} from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import { AuthContext } from "../../contexts/userContext";
+import {AuthContext} from "../../contexts/userContext";
 
 interface Student {
     uid: string;
@@ -55,11 +54,11 @@ export function StudentList() {
     useEffect(() => {
         setStudent([]);
 
-        const unsubscriber = store
+        return store
             .collection("users")
             .where("userType", "==", "student")
             .onSnapshot({}, (snapshot) => {
-                snapshot.docChanges().forEach((change, i) => {
+                snapshot.docChanges().forEach((change) => {
                     if (change.type === "added") {
                         setStudent((ps) => {
                             if (ps.filter((item) => item.uid === change.doc.id).length <= 0) {
@@ -105,8 +104,6 @@ export function StudentList() {
                     }
                 });
             });
-
-        return unsubscriber;
     }, [store]);
 
 
@@ -122,7 +119,7 @@ export function StudentList() {
                         alt=""
                     />
                     <a href="/">
-                        <img src="logos/logo.png" alt="" style={{ width: "50%" }} />
+                        <img src={"logos/logo.png"} alt="" style={{ width: "50%" }} />
                     </a>
                 </div>
 
@@ -132,7 +129,7 @@ export function StudentList() {
                     <div className="dropdown">
                         <button className="dropbtn"><i className="material-icons display-this">account_circle</i></button>
                         <div className="dropdown-content">
-                            <a href="/login">LogOut</a>
+                            <a href={"/login"}>LogOut</a>
                             <p>{username}</p>
                         </div>
                     </div>

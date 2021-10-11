@@ -8,7 +8,7 @@ interface IVideo {
     topic: string;
 }
 
-interface Quiz {
+interface IQuiz {
     uid: string;
     grade: string;
     options: Options[];
@@ -24,12 +24,6 @@ interface Options {
 const initVideo: IVideo = {
     topic: ""
 }
-const i = 0;
-
-interface Ans {
-    ans: string
-}
-
 
 export function Quiz() {
     const db = firebase.firestore();
@@ -73,28 +67,28 @@ export function Quiz() {
 
     console.log("t", video.topic);
 
-    const [q, setQ] = useState<Quiz[]>([]);
-    const [filteredQuiz, setFilteredQuiz] = useState<Quiz[]>([]);
+    const [q, setQ] = useState<IQuiz[]>([]);
+    const [filteredQuiz, setFilteredQuiz] = useState<IQuiz[]>([]);
 
     useEffect(() => {
         db.collection("quizes")
             .get()
             .then((querySnapshot) => {
-                let temp : Quiz[] = [];
+                let temp : IQuiz[] = [];
                 querySnapshot.forEach((doc) => {
-                    let video : Quiz  = doc.data() as Quiz;
+                    let video : IQuiz  = doc.data() as IQuiz;
                     temp.push(video);
                 });
                 setQ(temp);
                 setFilteredQuiz(temp);
             })
             .catch((error) => {
-                // console.log("Error getting documents: ", error);
+                console.log("Error getting documents: ", error);
             });
     },[db]) 
 
     useEffect(() => {
-        let temp : Quiz[] = [];
+        let temp : IQuiz[] = [];
         q.map(quiz => {
             if(quiz.topic === video.topic) {
                 temp.push(quiz);
@@ -146,7 +140,6 @@ export function Quiz() {
                             </div>
                             <br />
                             <div className='question-text'>{filteredQuiz[currentQuestion].question}</div>
-                            {console.log("quiz[currentQuestion].question", filteredQuiz[currentQuestion].question)}
                         </div>
                         <br />
                         <div className='answer-section'>

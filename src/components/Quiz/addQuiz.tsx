@@ -1,6 +1,4 @@
-import React, { useEffect, useState } from "react";
-import { useHistory } from "react-router-dom";
-import fire from "../../config/firebaseConfig";
+import React from "react";
 import firebase from "firebase";
 
 interface Quiz {
@@ -33,8 +31,7 @@ const initQuiz :Quiz = {
 
 const AddQuiz = () => {
 
-    const history = useHistory();
-    const [quiz, setQuiz] = useState(initQuiz);
+    const quiz = initQuiz;
 
     const id = Math.random().toString(36).substr(2, 5);
 
@@ -49,9 +46,9 @@ const AddQuiz = () => {
 
     return(
         <div>
-            <button onClick={(e: any) => {
+            <button onClick={ async (e: any) => {
                 e.preventDefault();
-                saveQuizInFirestore({
+                await saveQuizInFirestore({
                     uid: id,
                     grade: quiz.grade,
                     options: quiz.options,
@@ -63,8 +60,6 @@ const AddQuiz = () => {
             </button>
         </div>
     )
-    
-
 }
 
 export default AddQuiz;

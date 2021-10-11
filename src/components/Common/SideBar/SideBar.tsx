@@ -6,7 +6,7 @@ export function SideBar() {
             <div className="sidebar__categories">
                 <div className="sidebar__category">
                     <i className="material-icons">home</i>
-                    <span><a className={"sidebar-href"} href="/">Home</a></span>
+                    <span><a className={"sidebar-href"} href="/home">Home</a></span>
                 </div>
             </div>
             <hr/>

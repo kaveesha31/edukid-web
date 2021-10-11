@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useState} from "react";
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -9,23 +9,23 @@ import Box from '@mui/material/Box';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import { ThemeProvider, Theme, useTheme } from '@mui/material/styles';
+import {Theme, ThemeProvider, useTheme} from '@mui/material/styles';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
+import Select, {SelectChangeEvent} from '@mui/material/Select';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import Chip from '@mui/material/Chip';
 import fire from "../../config/firebaseConfig";
 import firebase from "firebase";
-import { useHistory } from "react-router-dom";
+import {useHistory} from "react-router-dom";
 import Validator from "../../resources/validations";
 import LinearProgress from '@mui/material/LinearProgress';
-import { FormHelperText } from "@mui/material";
+import {FormHelperText} from "@mui/material";
 import Snackbar from '@mui/material/Snackbar';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
-import { useFirestore } from "reactfire";
+import {useFirestore} from "reactfire";
 
 interface User {
   uid: string;
@@ -127,55 +127,53 @@ export function SignUp() {
   useEffect(() => {
     setTeachers([]);
 
-    const unsubscriber = store
-      .collection("users")
-      .where("userType", "==", "teacher")
-      .onSnapshot({}, (snapshot) => {
-        snapshot.docChanges().forEach((change, i) => {
-          if (change.type === "added") {
-            setTeachers((ps) => {
-              if (ps.filter((item) => item.uid === change.doc.id).length <= 0) {
-                ps.push({
-                  uid: change.doc.data().uid,
-                  email: change.doc.data().email,
-                  userType: change.doc.data().userType,
-                  fullName: change.doc.data().fullName,
-                  username: change.doc.data().username,
-                  TeacherGrade: change.doc.data().TeacherGrade,
-                });
-              }
-              return Object.assign([], ps);
-            });
-          }
-          if (change.type === "modified") {
-            setTeachers((ps) => {
-              const modified = ps.map((a) => {
-                if (a.uid === change.doc.id) {
-                  return {
-                    uid: change.doc.id,
+    return store
+        .collection("users")
+        .where("userType", "==", "teacher")
+        .onSnapshot({}, (snapshot) => {
+          snapshot.docChanges().forEach((change) => {
+            if (change.type === "added") {
+              setTeachers((ps) => {
+                if (ps.filter((item) => item.uid === change.doc.id).length <= 0) {
+                  ps.push({
+                    uid: change.doc.data().uid,
                     email: change.doc.data().email,
                     userType: change.doc.data().userType,
                     fullName: change.doc.data().fullName,
                     username: change.doc.data().username,
                     TeacherGrade: change.doc.data().TeacherGrade,
-                  };
-                } else {
-                  return a;
+                  });
                 }
+                return Object.assign([], ps);
               });
-              return Object.assign([], modified);
-            });
-          }
-          if (change.type === "removed") {
-            setTeachers((ps) => {
-              const removed = ps.filter((a) => a.uid !== change.doc.id);
-              return Object.assign([], removed);
-            });
-          }
+            }
+            if (change.type === "modified") {
+              setTeachers((ps) => {
+                const modified = ps.map((a) => {
+                  if (a.uid === change.doc.id) {
+                    return {
+                      uid: change.doc.id,
+                      email: change.doc.data().email,
+                      userType: change.doc.data().userType,
+                      fullName: change.doc.data().fullName,
+                      username: change.doc.data().username,
+                      TeacherGrade: change.doc.data().TeacherGrade,
+                    };
+                  } else {
+                    return a;
+                  }
+                });
+                return Object.assign([], modified);
+              });
+            }
+            if (change.type === "removed") {
+              setTeachers((ps) => {
+                const removed = ps.filter((a) => a.uid !== change.doc.id);
+                return Object.assign([], removed);
+              });
+            }
+          });
         });
-      });
-
-    return unsubscriber;
   }, [store]);
 
   const handleClick = () => {
@@ -342,7 +340,7 @@ export function SignUp() {
             TeacherGrade: teachersGrades,
             selectedTeacher: user.selectedTeacher
           })
-            .then((savedUser) => {
+            .then(() => {
               history.push("/login");
             })
             .catch((errorFirestore) => {
@@ -418,7 +416,7 @@ export function SignUp() {
                 id="demo-simple-select-filled"
                 value={user.userType}
                 onChange={handleChange}
-                error={user.userTypeError ? true : false}
+                error={!!user.userTypeError}
               >
                 <MenuItem value={'teacher'}>Teacher</MenuItem>
                 <MenuItem value={'student'}>Student</MenuItem>
@@ -433,7 +431,7 @@ export function SignUp() {
               label="Full Name"
               name="fullname"
               type="text"
-              error={user.fullNameError ? true : false}
+              error={!!user.fullNameError}
               helperText={user.fullNameError}
               onChange={(e) => {
                 setUser({
@@ -451,7 +449,7 @@ export function SignUp() {
               label="UserName"
               name="uname"
               type="text"
-              error={user.usernameError ? true : false}
+              error={!!user.usernameError}
               helperText={user.usernameError}
               onChange={(e) => {
                 setUser({
@@ -469,7 +467,7 @@ export function SignUp() {
               label="E-mail"
               name="email"
               type="email"
-              error={user.emailError ? true : false}
+              error={!!user.emailError}
               helperText={user.emailError}
               onChange={(e) => {
                 setUser({
@@ -486,7 +484,7 @@ export function SignUp() {
                 id="demo-simple-select-filled"
                 value={user.StudentGrade}
                 onChange={handleChangestudentGrade}
-                error={user.StudentGradeError ? true : false}
+                error={!!user.StudentGradeError}
               >
                 <MenuItem value={'3'}>G-03</MenuItem>
                 <MenuItem value={'4'}>G-04</MenuItem>
@@ -495,7 +493,7 @@ export function SignUp() {
                 <MenuItem value={'7'}>G-07</MenuItem>
                 <MenuItem value={'8'}>G-08</MenuItem>
               </Select>
-            </FormControl></div> : <div></div>}
+            </FormControl></div> : <div>{}</div>}
             {user.StudentGradeError && <FormHelperText style={{ marginLeft: "20px", color: "#bf0404", fontWeight: "normal" }}>Grade cannot be empty</FormHelperText>}
             {
               user.userType === 'student' ? <div><FormControl variant="outlined" style={{ minWidth: 'calc(100%)', marginTop: "15px" }}>
@@ -505,7 +503,7 @@ export function SignUp() {
                   id="demo-simple-select-filled"
                   value={user.selectedTeacher}
                   onChange={handleChangeSelectedTeacher}
-                  error={user.selectedTeacherError ? true : false}
+                  error={!!user.selectedTeacherError}
                 >
                   {teacher.filter((f:any)=>(
                     f.TeacherGrade.includes(user.StudentGrade)
@@ -514,7 +512,7 @@ export function SignUp() {
                   ))}
                 </Select>
               </FormControl>
-                {user.selectedTeacherError && <FormHelperText style={{ marginLeft: "20px", color: "#bf0404", fontWeight: "normal" }}>Teacher cannot be empty</FormHelperText>}</div> : <div></div>
+                {user.selectedTeacherError && <FormHelperText style={{ marginLeft: "20px", color: "#bf0404", fontWeight: "normal" }}>Teacher cannot be empty</FormHelperText>}</div> : <div>{}</div>
             }
             {user.userType === 'teacher' ? <div><FormControl style={{ minWidth: 'calc(100%)', marginTop: "15px" }}>
               <InputLabel id="demo-multiple-chip-label">Teacher's Grades</InputLabel>
@@ -524,7 +522,7 @@ export function SignUp() {
                 multiple
                 value={teachersGrades}
                 onChange={handleChangeTeachersGrades}
-                error={user.TeacherGradeError ? true : false}
+                error={!!user.TeacherGradeError}
                 input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
                 renderValue={(selected: any) => (
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
@@ -545,7 +543,7 @@ export function SignUp() {
                   </MenuItem>
                 ))}
               </Select>
-            </FormControl></div> : <div></div>}
+            </FormControl></div> : <div>{}</div>}
             {user.TeacherGradeError && <FormHelperText style={{ marginLeft: "20px", color: "#bf0404", fontWeight: "normal" }}>Teacher's grade cannot be empty</FormHelperText>}
             <TextField
               margin="normal"
@@ -555,7 +553,7 @@ export function SignUp() {
               label="Password"
               type="password"
               id="password"
-              error={user.passwordError ? true : false}
+              error={!!user.passwordError}
               helperText={user.passwordError}
               onChange={(e) => {
                 setUser({
@@ -573,7 +571,7 @@ export function SignUp() {
               label="Confirm Password"
               type="password"
               id="confirmPpassword"
-              error={user.confirmPasswordError ? true : false}
+              error={!!user.confirmPasswordError}
               helperText={user.confirmPasswordError}
               onChange={(e) => {
                 setUser({
@@ -602,7 +600,7 @@ export function SignUp() {
             </Button>
             <Grid container>
               <Grid item>
-                <Link href="/login" variant="body2">
+                <Link href={"/login"} variant="body2">
                   {"Already have an account? Login"}
                 </Link>
               </Grid>

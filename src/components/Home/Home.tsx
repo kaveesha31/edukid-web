@@ -24,10 +24,8 @@ export function Home() {
     const [filteredVideos, setFilteredVideos] = useState<IVideo[]>([]);
     const [search, setSearch] = useState<string>("");
     const username = "user";
-    const likeCount = 0;
     const [videoURL, setVideoURL] = useState<string>("");
     const [videoTopic, setVideoTopic] = useState<string>("");
-    const [Topic, setTopic] = useState<string>("");
     const [like, setLike] = useState<boolean>(false);
     const [unLike, setUnLike] = useState<boolean>(false);
     const [quizBtn, setQuizBtn] = useState<boolean>(false);
@@ -48,7 +46,7 @@ export function Home() {
                 setFilteredVideos(temp);
             })
             .catch((error) => {
-                // console.log("Error getting documents: ", error);
+                console.log("Error getting documents: ", error);
             });
     },[db]) 
 
@@ -81,7 +79,7 @@ export function Home() {
                         alt=""
                     />
                     <a href="/">
-                        <img src="logos/logo.png" alt="" style={{width:"50%"}}/>
+                        <img src={"logos/logo.png"} alt="" style={{width:"50%"}}/>
                     </a>
                 </div>
 
@@ -97,7 +95,7 @@ export function Home() {
                     <div className="dropdown">
                         <button className="dropbtn"><i className="material-icons display-this">account_circle</i></button>
                         <div className="dropdown-content">
-                            <a href="/login">LogOut</a>
+                            <a href={"/login"}>LogOut</a>
                             <p>{username}</p>
                         </div>
                         </div>
@@ -177,10 +175,10 @@ export function Home() {
                                 
                                 return (<div className="itemsContainer">
                                                 <div className="image">
-                                                <a onClick={() => {setVideoTopic(video.videoID); setVideoURL(video.videoUrl); setTopic(video.topic); setQuizBtn(false)}} style={{textDecoration:"none"}}><Video title={video.videoTitle} thumbnail={video.videoImage}
+                                                <a href={"#/"} onClick={() => {setVideoTopic(video.videoID); setVideoURL(video.videoUrl); setQuizBtn(false)}} style={{textDecoration:"none"}}><Video title={video.videoTitle} thumbnail={video.videoImage}
                                                publishedDate={video.videoDatePublished} views={video.videoViews} />                                             
                                                </a></div>
-                                               <div className="play"><a onClick={() => { setVideoTopic(video.videoID);  setTopic(video.topic); setVideoURL(video.videoUrl); setQuizBtn(false)}}><img src="./images/play-circle-regular.svg" alt="" /></a></div>
+                                               <div className="play"><a href={"#/"} onClick={() => { setVideoTopic(video.videoID); setVideoURL(video.videoUrl); setQuizBtn(false)}}><img src={"./images/play-circle-regular.svg"} alt="" /></a></div>
                                             </div>)
                             })
                         }
