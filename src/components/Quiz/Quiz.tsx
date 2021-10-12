@@ -117,14 +117,14 @@ export function Quiz() {
     console.log("filteredQuiz", filteredQuiz);
 
     return (
-        <div>
+        <div style={{padding:"100px", height:"100%"}}>
             {filteredQuiz.length > 0 && <div className='app'>
                 {showScore ? (
-                    <div style={{ textAlign: "center" }}>
-                        <div className='score-section'>
+                    <div style={{ marginTop:"150px", textAlign: "center" }}>
+                        <div style={{ fontSize:"40px" }} className='score-section'>
                             You scored {score} out of {filteredQuiz.length}
                         </div>
-                        <button onClick={(e: any) => {
+                        <button style={{marginTop:"100px", borderRadius:"50px", fontSize:"30px", width:"30%", backgroundColor:"#b6d3f0" }} onClick={(e: any) => {
                             e.preventDefault();
                             updateUserInFirestore({
                                 score: score,
@@ -136,10 +136,10 @@ export function Quiz() {
                     <>
                         <div style={{ textAlign: "center" }} className='question-section'>
                             <div className='question-count'>
-                                <span>Question {currentQuestion + 1}</span>/{filteredQuiz.length}
+                                <span style={{fontSize:"40px"}}>Question  {currentQuestion + 1}/{filteredQuiz.length}</span>
                             </div>
                             <br />
-                            <div className='question-text'>{filteredQuiz[currentQuestion].question}</div>
+                            <div style={{fontSize:"30px"}} className='question-text'>{filteredQuiz[currentQuestion].question}</div>
                         </div>
                         <br />
                         <div className='answer-section'>
@@ -147,7 +147,7 @@ export function Quiz() {
                             {filteredQuiz[currentQuestion].options.map((answerOption: any) => (
                                 <div style={{ textAlign: "center" }}>
                                     <br />
-                                    <button onClick={() => handleAnswerOptionClick(answerOption.isCorrect)}>{answerOption.answerText}</button>
+                                    <button style={{borderRadius:"50px", fontSize:"30px", width:"30%", backgroundColor:"#b6d3f0"}} onClick={() => handleAnswerOptionClick(answerOption.isCorrect)}>{answerOption.answerText}</button>
                                 </div>
                             ))}
                         </div>

@@ -5,6 +5,7 @@ import {Video} from "../Common/Video/Video";
 import ReactPlayer from 'react-player';
 import { AuthContext } from "../../contexts/userContext";
 import { useHistory } from "react-router";
+import fire from "../../config/firebaseConfig";
 
 interface IVideo {
     videDuration : string;
@@ -33,6 +34,12 @@ export function Home() {
     const [quizBtn, setQuizBtn] = useState<boolean>(false);
     const authContext = useContext(AuthContext);
     const history = useHistory();
+
+    const handleLogOut = async () => {
+        sessionStorage.setItem("isAuthed", "false");
+        localStorage.setItem("isAuthed", "false");
+        await fire.auth().signOut();
+    };
 
     useEffect(() => {
         db.collection("videos_automated")
@@ -81,9 +88,15 @@ export function Home() {
                         src="https://www.youtube.com/about/static/svgs/icons/brand-resources/YouTube-logo-full_color_light.svg?cache=72a5d9c"
                         alt=""
                     />
-                    <a href="/">
+                    <div onClick={() =>{
+                        if(authContext.userType === "teacher"){
+                            history.push("/classrooms");
+                        } else {
+                            history.push("/home");
+                        }
+                    }} >
                         <img src={"logos/logo.png"} alt="" style={{width:"50%"}}/>
-                    </a>
+                    </div>
                 </div>
 
                 <div className="header__search">
@@ -98,7 +111,10 @@ export function Home() {
                     <div className="dropdown">
                         <button className="dropbtn"><i className="material-icons display-this">account_circle</i></button>
                         <div className="dropdown-content">
-                            <a href={"/login"}>LogOut</a>
+                            <a onClick={ async () => {
+                                await handleLogOut();
+                                history.push("/login");
+                            }}>Logout</a>
                             <p>{username}</p>
                         </div>
                         </div>

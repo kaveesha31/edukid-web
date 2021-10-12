@@ -1,12 +1,14 @@
-import React from "react";
+import React, { useContext } from "react";
 import { SideBar } from "../Common/SideBar/SideBar";
 import fire from "../../config/firebaseConfig";
 import { useHistory } from "react-router";
+import { AuthContext } from "../../contexts/userContext";
 
 export function ClassRoom() {
 
     const username = "user";
     const history = useHistory();
+    const authContext = useContext(AuthContext); 
 
     const handleLogOut = async () => {
         sessionStorage.setItem("isAuthed", "false");
@@ -23,9 +25,15 @@ export function ClassRoom() {
                         src="https://www.youtube.com/about/static/svgs/icons/brand-resources/YouTube-logo-full_color_light.svg?cache=72a5d9c"
                         alt=""
                     />
-                    <a href="/">
-                        <img src={"logos/logo.png"} alt="" style={{ width: "50%" }} />
-                    </a>
+                    <div onClick={() =>{
+                        if(authContext.userType === "teacher"){
+                            history.push("/classrooms");
+                        } else {
+                            history.push("/home");
+                        }
+                    }} >
+                        <img src={"logos/logo.png"} alt="" style={{width:"50%"}}/>
+                    </div>
                 </div>
 
 
@@ -34,10 +42,10 @@ export function ClassRoom() {
                     <div className="dropdown">
                         <button className="dropbtn"><i className="material-icons display-this">account_circle</i></button>
                         <div className="dropdown-content">
-                            <div onClick={ async () => {
+                            <a onClick={ async () => {
                                 await handleLogOut();
                                 history.push("/login");
-                            }}>Logout</div>
+                            }}>Logout</a>
                             <p>{username}</p>
                         </div>
                     </div>

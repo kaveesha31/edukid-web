@@ -7,9 +7,9 @@ export function Landing() {
             <div className="header">
                 <div className="header__left">
                     
-                    <a href="/">
+                    <div>
                         <img src={"logos/logo.png"} alt="" style={{width:"50%"}}/>
-                    </a>
+                    </div>
                 </div>
 
                 <div className="header__icons">

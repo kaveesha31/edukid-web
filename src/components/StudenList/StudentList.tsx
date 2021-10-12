@@ -10,6 +10,8 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import {AuthContext} from "../../contexts/userContext";
+import fire from "../../config/firebaseConfig";
+import { useHistory } from "react-router";
 
 interface Student {
     uid: string;
@@ -50,6 +52,13 @@ export function StudentList() {
     
     const currentPath = window.location.pathname;
     const tId = currentPath.substr(currentPath.indexOf("classrooms/") + 11);
+    const history = useHistory();
+
+    const handleLogOut = async () => {
+        sessionStorage.setItem("isAuthed", "false");
+        localStorage.setItem("isAuthed", "false");
+        await fire.auth().signOut();
+    };
 
     useEffect(() => {
         setStudent([]);
@@ -118,9 +127,15 @@ export function StudentList() {
                         src="https://www.youtube.com/about/static/svgs/icons/brand-resources/YouTube-logo-full_color_light.svg?cache=72a5d9c"
                         alt=""
                     />
-                    <a href="/">
-                        <img src={"logos/logo.png"} alt="" style={{ width: "50%" }} />
-                    </a>
+                    <div onClick={() =>{
+                        if(authContext.userType === "teacher"){
+                            history.push("/classrooms");
+                        } else {
+                            history.push("/home");
+                        }
+                    }} >
+                        <img src={"logos/logo.png"} alt="" style={{width:"50%"}}/>
+                    </div>
                 </div>
 
 
@@ -129,7 +144,10 @@ export function StudentList() {
                     <div className="dropdown">
                         <button className="dropbtn"><i className="material-icons display-this">account_circle</i></button>
                         <div className="dropdown-content">
-                            <a href={"/login"}>LogOut</a>
+                            <a onClick={ async () => {
+                                await handleLogOut();
+                                history.push("/login");
+                            }}>Logout</a>
                             <p>{username}</p>
                         </div>
                     </div>
