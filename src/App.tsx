@@ -13,6 +13,7 @@ import { Quiz } from './components/Quiz/Quiz';
 import  {Landing} from "./components/Landing/Landing";
 import AddQuiz from './components/Quiz/addQuiz';
 import Welcome from './components/Welcome/welcome';
+import UserProfile from './components/User_Profile/userProfile';
 
 
 const history = createBrowserHistory();
@@ -50,6 +51,7 @@ function App() {
           <Route path="/welcome" component={Welcome} exact />
           <Route path="/addQuiz" component={AddQuiz} exact />
           <Route path="/quiz/:id" component={Quiz} exact />
+          <Route path="/userprofile" component={UserProfile} exact />
         </Switch>
       </Router>
     </AuthProvider>

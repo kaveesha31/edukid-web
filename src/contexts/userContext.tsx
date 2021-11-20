@@ -11,6 +11,8 @@ interface User {
     email: string;
     StudentGrade: string;
     TeacherGrade: string[];
+    score:number;
+    history: string[] | undefined;
 }
 
 const initUer: User = {
@@ -22,6 +24,8 @@ const initUer: User = {
     email: "",
     StudentGrade: "",
     TeacherGrade: [],
+    score: 0,
+    history: [],
 };
 
 type ContextProps = {
@@ -36,6 +40,8 @@ type ContextProps = {
     email: string;
     StudentGrade: string;
     TeacherGrade: string[];
+    score:number;
+    history: string[];
   };
 
   export const AuthContext = React.createContext<Partial<ContextProps>>({});
@@ -72,6 +78,8 @@ export const AuthProvider = ({ children }: any) => {
               const username = userData.username;
               const StudentGrade = userData.StudentGrade;
               const TeacherGrade = userData.TeacherGrade;
+              const score = userData.score;
+              const history = userData.history ? userData.history : "no data"; 
               return Object.assign(
                 {},
                 {
@@ -83,6 +91,8 @@ export const AuthProvider = ({ children }: any) => {
                   username,
                   StudentGrade,
                   TeacherGrade,
+                  score,
+                  history,
                   user,
                 }
               );
@@ -106,6 +116,8 @@ export const AuthProvider = ({ children }: any) => {
         username: state.username,
         StudentGrade: state.StudentGrade,
         TeacherGrade: state.TeacherGrade,
+        score: state.score,
+        history: state.history,
       }}
     >
       {children}
