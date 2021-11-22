@@ -23,6 +23,30 @@ interface IVideo {
     likes: number;
 }
 
+interface User {
+    uid: string| undefined;
+    userType: string | undefined;
+    fullName: string | undefined;
+    username: string | undefined;
+    email: string | undefined;
+    StudentGrade: string | undefined;
+    TeacherGrade: string[] | undefined;
+    score: number | undefined;
+    history: string[] | undefined;
+}
+
+const initUser: User = {
+    uid: "",
+    userType: "",
+    fullName: "",
+    username: "",
+    email: "",
+    StudentGrade: "",
+    TeacherGrade: [],
+    score: 0,
+    history: [],
+}
+
 export function Home() {
 
     const db = firebase.firestore();
@@ -40,12 +64,33 @@ export function Home() {
     const [likeCount, setLikeCount] = useState<number>(0);
     const [unlikeCount, setUnlikeCount] = useState<number>(0);
     const [viewsCount, setViewsCount] = useState<number>(0);
+    const [user, setuser] = useState(initUser);
+    
 
     const handleLogOut = async () => {
         sessionStorage.setItem("isAuthed", "false");
         localStorage.setItem("isAuthed", "false");
         await fire.auth().signOut();
     };
+
+    useEffect(() => {
+        if (
+            localStorage.getItem("isAuthed") === "true" ||
+            sessionStorage.getItem("isAuthed") === "true"
+        ) {
+            setuser({
+                uid: authContext.uid,
+                userType: authContext.userType,
+                fullName: authContext.fullName,
+                username: authContext.username,
+                email: authContext.email,
+                StudentGrade: authContext.StudentGrade,
+                TeacherGrade: authContext.TeacherGrade,
+                score: authContext.score,
+                history: authContext.history ? authContext.history : ["default"],
+            });
+        }
+    }, [authContext]);
 
     useEffect(() => {
         db.collection("videos_automated")
@@ -83,16 +128,34 @@ export function Home() {
         setFilteredVideos(temp);
     }, [search, videos])
 
-    console.log("videoTopic", videoTopic)
+    // console.log("user.history", user.history)
+    // console.log("user", user)
+
+    const popArrayElements = (data: any) => {
+        console.log("data", data)
+        
+        var arr = user.history?.push(data);
+        console.log("arr", arr)
+        console.log("user", user.history)
+        updateUserInFirestore(user.history);
+    }
 
     const updateUserInFirestore = (userFirestore: any) => {
 
-        db.collection("users")
-            .where("uid", "==", authContext.user && authContext.user.uid)
-            .get()
-            .then(async (userQS) => {
-                return await userQS.docs[0].ref.set({ history: [userFirestore] }, { merge: true });
-            })
+        // db.collection("users")
+        //     .where("uid", "==", authContext.user && authContext.user.uid)
+        //     .get()
+        //     .then(async (userQS) => {
+        //         return await userQS.docs[0].ref.set(userFirestore, { merge: true });
+        //     })
+
+        firebase.firestore()
+            .collection('users')
+            .doc(authContext.id)
+            .set(
+                { userFirestore },
+                { merge: true }
+            )
     };
 
     return (
@@ -186,14 +249,14 @@ export function Home() {
                                 </div>
 
                                 <div className="like_section d-flex justify-content-start col-sm">
-                                <div><button>
-                                            <div className="like_btn">
-                                                <i className="material-icons" >remove_red_eye</i>
-                                                <span>Views</span>
-                                                <span>{viewsCount}</span>
-                                            </div>
-                                        </button>
+                                    <div><button>
+                                        <div className="like_btn">
+                                            <i className="material-icons" >remove_red_eye</i>
+                                            <span>Views</span>
+                                            <span>{viewsCount}</span>
                                         </div>
+                                    </button>
+                                    </div>
                                 </div>
 
                                 <div className="quiz_section d-flex justify-content-start col-sm">
@@ -226,7 +289,10 @@ export function Home() {
                                 return (<div className="itemsContainer">
                                     <div className="image">
                                         <a href={"#/"} onClick={() => {
-                                            setVideoTopic(video.videoID); setVideoURL(video.videoUrl); setQuizBtn(false); updateUserInFirestore(video.videoTitle); setLikeCount(video.likes); setUnlikeCount(video.unlikes); setViewsCount(video.videoViews)
+                                            setVideoTopic(video.videoID); setVideoURL(video.videoUrl); setQuizBtn(false);
+                                            setLikeCount(video.likes);
+                                            setUnlikeCount(video.unlikes); setViewsCount(video.videoViews);
+                                            setuser({ ...user, history: authContext.history }); popArrayElements(video.videoTitle);
                                         }} style={{ textDecoration: "none" }}><Video title={video.videoTitle} thumbnail={video.videoImage}
                                             publishedDate={video.videoDatePublished} views={video.videoViews} />
                                         </a></div>

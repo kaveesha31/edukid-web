@@ -149,12 +149,6 @@ const UserProfile = () => {
                                                 </div>
                                                 <hr />
                                             </div>)}
-                                            <div className="row">
-                                                <div className="col-sm-12">
-                                                    {/* <a className="btn btn-info " target="__blank" href="https://www.bootdey.com/snippets/view/profile-edit-data-and-skills">Edit</a> */}
-                                                    <button className="btn btn-info ">Edit</button>
-                                                </div>
-                                            </div>
                                         </div>
                                     </div>
                                 </div>

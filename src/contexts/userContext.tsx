@@ -3,65 +3,68 @@ import { useFirestore } from "reactfire";
 import firebase from "../config/firebaseConfig";
 
 interface User {
-    fireUser: firebase.User | null;
-    uid: string;
-    userType: string;
-    fullName: string;
-    username: string;
-    email: string;
-    StudentGrade: string;
-    TeacherGrade: string[];
-    score:number;
-    history: string[] | undefined;
+  fireUser: firebase.User | null;
+  uid: string;
+  userType: string;
+  fullName: string;
+  username: string;
+  email: string;
+  StudentGrade: string;
+  TeacherGrade: string[];
+  score: number;
+  history: string[];
+  id: string;
 }
 
 const initUer: User = {
-    fireUser: null,
-    uid: "",
-    userType: "",
-    fullName: "",
-    username: "",
-    email: "",
-    StudentGrade: "",
-    TeacherGrade: [],
-    score: 0,
-    history: [],
+  fireUser: null,
+  uid: "",
+  userType: "",
+  fullName: "",
+  username: "",
+  email: "",
+  StudentGrade: "",
+  TeacherGrade: [],
+  score: 0,
+  history: [],
+  id: "",
 };
 
 type ContextProps = {
-    user: firebase.User | null;
-    authenticated: boolean;
-    setUser: any;
-    loadingAuthState: boolean;
-    userType: string;
-    fullName: string;
-    uid: string;
-    username: string;
-    email: string;
-    StudentGrade: string;
-    TeacherGrade: string[];
-    score:number;
-    history: string[];
-  };
+  user: firebase.User | null;
+  authenticated: boolean;
+  setUser: any;
+  loadingAuthState: boolean;
+  userType: string;
+  fullName: string;
+  uid: string;
+  username: string;
+  email: string;
+  StudentGrade: string;
+  TeacherGrade: string[];
+  score: number;
+  history: string[];
+  id: string;
+};
 
-  export const AuthContext = React.createContext<Partial<ContextProps>>({});
+export const AuthContext = React.createContext<Partial<ContextProps>>({});
 export const AuthProvider = ({ children }: any) => {
-  
-    const [user, setUser] = useState(null as firebase.User | null);
-    const [loadingAuthState, setLoadingAuthState] = useState(true);
-  
-    const currentUser: firebase.User | null = firebase.auth().currentUser;
-    const store = useFirestore();
-    const [state, setState] = useState(initUer);
 
-    useEffect(() => {
-        firebase.auth().onAuthStateChanged((user: any) => {
-          setUser(user);
-          setLoadingAuthState(false);
-        });
-      }, []);
+  const [user, setUser] = useState(null as firebase.User | null);
+  const [loadingAuthState, setLoadingAuthState] = useState(true);
 
-      
+  const currentUser: firebase.User | null = firebase.auth().currentUser;
+  const store = useFirestore();
+  const [state, setState] = useState(initUer);
+
+  useEffect(() => {
+    firebase.auth().onAuthStateChanged((user: any) => {
+      setUser(user);
+      setLoadingAuthState(false);
+    });
+  }, []);
+
+
   useEffect(() => {
     store
       .collection("users")
@@ -71,6 +74,7 @@ export const AuthProvider = ({ children }: any) => {
           if (change.type === "added" || change.type === "modified") {
             setState((ps) => {
               const userData: any = change.doc.data();
+              const id = change.doc.id
               const uid = userData.uid;
               const fullName = userData.fullName;
               const email = userData.email;
@@ -79,12 +83,13 @@ export const AuthProvider = ({ children }: any) => {
               const StudentGrade = userData.StudentGrade;
               const TeacherGrade = userData.TeacherGrade;
               const score = userData.score;
-              const history = userData.history ? userData.history : "no data"; 
+              const history = userData.userFirestore ? userData.userFirestore : "no data";
               return Object.assign(
                 {},
                 {
                   ...ps,
                   uid,
+                  id,
                   fullName,
                   email,
                   userType,
@@ -118,6 +123,7 @@ export const AuthProvider = ({ children }: any) => {
         TeacherGrade: state.TeacherGrade,
         score: state.score,
         history: state.history,
+        id: state.id,
       }}
     >
       {children}

@@ -338,7 +338,8 @@ export function SignUp() {
             email: user.email,
             StudentGrade: user.StudentGrade,
             TeacherGrade: teachersGrades,
-            selectedTeacher: user.selectedTeacher
+            selectedTeacher: user.selectedTeacher,
+            userFirestore: [],
           })
             .then(() => {
               history.push("/login");
