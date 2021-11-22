@@ -15,6 +15,7 @@ import FormControl from '@mui/material/FormControl';
 import ListItemText from '@mui/material/ListItemText';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import Checkbox from '@mui/material/Checkbox';
+import FieldValue = firebase.firestore.FieldValue;
 
 
 const ITEM_HEIGHT = 48;
@@ -96,6 +97,7 @@ export function Home() {
     const [user, setuser] = useState(initUser);
     const [filter, setFilter] = React.useState<string[]>([]);
     const [fillVideos, setFillVideos] = useState<IVideo[]>([]);
+    const [videoID,setSelectedVideo] = useState<string>("");
 
 
     const handleLogOut = async () => {
@@ -226,6 +228,58 @@ export function Home() {
             )
     };
 
+    async function updateLikes(isIncrement : boolean) {
+        await firebase.firestore()
+            .collection('videos_automated')
+            .doc(videoID)
+            .update({
+                likes : FieldValue.increment(isIncrement ? 1 : -1)
+            });
+    }
+
+    async function updateDislikes(isIncrement : boolean) {
+        await firebase.firestore()
+            .collection('videos_automated')
+            .doc(videoID)
+            .update({
+                unlikes : FieldValue.increment(isIncrement ? 1 : -1)
+            });
+    }
+
+    async function clickLike() {
+        if(like) {
+            setLike(false);
+            await updateLikes(false);
+            setLikeCount(likeCount-1);
+        } else {
+            if(unLike) {
+                setUnLike(false);
+                await updateDislikes(false);
+                setUnlikeCount(unlikeCount-1);
+            }
+            setLike(true);
+            await updateLikes(true);
+            setLikeCount(likeCount+1);
+        }
+    }
+
+    async function clickDislike() {
+        if(unLike) {
+            setUnLike(false);
+            await updateDislikes(false);
+            setUnlikeCount(unlikeCount-1);
+        } else {
+            if(like) {
+                setLike(false);
+                await updateLikes(false);
+                setLikeCount(likeCount-1);
+            }
+            setUnLike(true);
+            await updateDislikes(true);
+            setUnlikeCount(unlikeCount+1);
+        }
+    }
+
     return (
         <>
             <div className="header">
@@ -302,7 +356,7 @@ export function Home() {
                             <div className="feedback_area row mt-2">
                                 <div className="like_section d-flex justify-content-start col-sm">
                                     {like
-                                        ? <div><button onClick={() => setLike(!like)} style={{ borderRadius: '5px' }}>
+                                        ? <div><button onClick={async () => await clickLike()} style={{ borderRadius: '5px' }}>
                                             <div className="like_btn" >
                                                 <i className="material-icons" style={{ color: '#0571ed' }}>thumb_up</i>
                                                 <span style={{ color: '#0571ed' }}>Liked</span>
@@ -310,7 +364,7 @@ export function Home() {
                                             </div>
                                         </button>
                                         </div>
-                                        : <div><button onClick={() => setLike(!like)}>
+                                        : <div><button onClick={async () => await clickLike()}>
                                             <div className="like_btn">
                                                 <i className="material-icons" >thumb_up</i>
                                                 <span>Like</span>
@@ -322,18 +376,18 @@ export function Home() {
                                 </div>
                                 <div className="like_section d-flex justify-content-start col-sm">
                                     {unLike
-                                        ? <div><button onClick={() => setUnLike(!like)} style={{ borderRadius: '5px' }}>
+                                        ? <div><button onClick={async () => await clickDislike()} style={{ borderRadius: '5px' }}>
                                             <div className="like_btn" >
                                                 <i className="material-icons" style={{ color: '#0571ed' }}>thumb_down</i>
-                                                <span style={{ color: '#0571ed' }}>Un Liked</span>
+                                                <span style={{ color: '#0571ed' }}>Dislike</span>
                                                 <span style={{ color: '#0571ed' }}>{unlikeCount}</span>
                                             </div>
                                         </button>
                                         </div>
-                                        : <div><button onClick={() => setUnLike(!like)}>
+                                        : <div><button onClick={async () => await clickDislike()}>
                                             <div className="like_btn">
                                                 <i className="material-icons" >thumb_down</i>
-                                                <span>Un Like</span>
+                                                <span>Dislike</span>
                                                 <span>{unlikeCount}</span>
                                             </div>
                                         </button>
@@ -385,6 +439,7 @@ export function Home() {
                                             setVideoTopic(video.videoID); setVideoURL(video.videoUrl); setQuizBtn(false);
                                             setLikeCount(video.likes);
                                             setUnlikeCount(video.unlikes); setViewsCount(video.videoViews);
+                                            setSelectedVideo(video.videoID);
                                             setuser({ ...user, history: authContext.history }); popArrayElements(video.videoTitle);
                                         }} style={{ textDecoration: "none" }}><Video title={video.videoTitle} thumbnail={video.videoImage}
                                             publishedDate={video.videoDatePublished} views={video.videoViews} />
