@@ -8,6 +8,27 @@ import { useHistory } from "react-router";
 import { useFirestore } from "reactfire";
 import fire from "../../config/firebaseConfig";
 
+import OutlinedInput from '@mui/material/OutlinedInput';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import ListItemText from '@mui/material/ListItemText';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
+import Checkbox from '@mui/material/Checkbox';
+
+
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+    PaperProps: {
+        style: {
+            maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+            width: 250,
+        },
+    },
+};
+
+
 interface IVideo {
     videDuration: string;
     videoDatePublished: string;
@@ -21,10 +42,11 @@ interface IVideo {
     ranking_score: number;
     unlikes: number;
     likes: number;
+    style: string;
 }
 
 interface User {
-    uid: string| undefined;
+    uid: string | undefined;
     userType: string | undefined;
     fullName: string | undefined;
     username: string | undefined;
@@ -47,6 +69,13 @@ const initUser: User = {
     history: [],
 }
 
+const filters = [
+    'animation',
+    'khan-style',
+    'taking-head',
+    'whiteboard',
+];
+
 export function Home() {
 
     const db = firebase.firestore();
@@ -65,13 +94,52 @@ export function Home() {
     const [unlikeCount, setUnlikeCount] = useState<number>(0);
     const [viewsCount, setViewsCount] = useState<number>(0);
     const [user, setuser] = useState(initUser);
-    
+    const [filter, setFilter] = React.useState<string[]>([]);
+    const [fillVideos, setFillVideos] = useState<IVideo[]>([]);
+
 
     const handleLogOut = async () => {
         sessionStorage.setItem("isAuthed", "false");
         localStorage.setItem("isAuthed", "false");
         await fire.auth().signOut();
     };
+
+    const handleChange = (event: SelectChangeEvent<typeof filter>) => {
+        const {
+            target: { value },
+        } = event;
+        setFilter(
+            // On autofill we get a the stringified value.
+            typeof value === 'string' ? value.split(',') : value,
+        );
+    };
+
+    const filtering = (data: any) => {
+
+        let tempIVideoAnimation: IVideo[] = [];
+        let tempIVideotakingHead: IVideo[] = [];
+        let tempIVideokhanStyle: IVideo[] = [];
+        let tempIVideoWhiteboard: IVideo[] = [];
+        let tempIVideo: IVideo[] = [];
+
+        const a = filter[0];
+        const b = filter[1];
+        const c = filter[2];
+        const d = filter[3];
+
+        if (a) {
+            tempIVideoAnimation = data.filter((x: any) => (x.style === a));
+        } if (b) {
+            tempIVideotakingHead = data.filter((x: any) => (x.style === b));
+        } if (c) {
+            tempIVideokhanStyle.push(data.filter((x: any) => (x.style === c)));
+        } if (d) {
+            tempIVideoWhiteboard.push(data.filter((x: any) => (x.style === d)));
+        }
+
+        tempIVideo = tempIVideotakingHead.concat(tempIVideoAnimation, tempIVideokhanStyle, tempIVideoWhiteboard);
+        setFillVideos(tempIVideo);
+    }
 
     useEffect(() => {
         if (
@@ -129,11 +197,11 @@ export function Home() {
     }, [search, videos])
 
     // console.log("user.history", user.history)
-    // console.log("user", user)
+    console.log("filter", filter)
 
     const popArrayElements = (data: any) => {
         console.log("data", data)
-        
+
         var arr = user.history?.push(data);
         console.log("arr", arr)
         console.log("user", user.history)
@@ -185,8 +253,33 @@ export function Home() {
                     </form>
                 </div>
 
+                <div>
+                    <FormControl sx={{ m: 1, width: 300 }}>
+                        <InputLabel id="demo-multiple-checkbox-label">Filter</InputLabel>
+                        <Select
+                            style={{ height: "50px" }}
+                            labelId="demo-multiple-checkbox-label"
+                            id="demo-multiple-checkbox"
+                            multiple
+                            value={filter}
+                            onChange={handleChange}
+                            input={<OutlinedInput label="Filter" />}
+                            renderValue={(selected) => selected.join(', ')}
+                            MenuProps={MenuProps}
+                        >
+                            {filters.map((name) => (
+                                <MenuItem key={name} value={name}>
+                                    <Checkbox checked={filter.indexOf(name) > -1} />
+                                    <ListItemText primary={name} />
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                </div>
+
+                <button style={{ color: "Highlight", border: "none" }} className="material-icons" onClick={() => { filtering(filteredVideos) }}>filter_alt</button>
+
                 <div className="header__icons">
-                    <i className="material-icons">notifications</i>
                     <div className="dropdown">
                         <button className="dropbtn"><i className="material-icons display-this">account_circle</i></button>
                         <div className="dropdown-content">
@@ -280,7 +373,7 @@ export function Home() {
                         </div>
                         : null
                     }
-                    <div className="videos__container">
+                    {filter.length === 0 && <div className="videos__container">
                         {
                             filteredVideos.filter((item: any) => (
                                 (item.grade === authContext.StudentGrade)
@@ -300,7 +393,28 @@ export function Home() {
                                 </div>)
                             })
                         }
-                    </div>
+                    </div>}
+                    {filter.length != 0 && <div className="videos__container">
+                        {
+                            fillVideos.filter((item: any) => (
+                                (item.grade === authContext.StudentGrade)
+                            )).map(video => {
+
+                                return (<div className="itemsContainer">
+                                    <div className="image">
+                                        <a href={"#/"} onClick={() => {
+                                            setVideoTopic(video.videoID); setVideoURL(video.videoUrl); setQuizBtn(false);
+                                            setLikeCount(video.likes);
+                                            setUnlikeCount(video.unlikes); setViewsCount(video.videoViews);
+                                            setuser({ ...user, history: authContext.history }); popArrayElements(video.videoTitle);
+                                        }} style={{ textDecoration: "none" }}><Video title={video.videoTitle} thumbnail={video.videoImage}
+                                            publishedDate={video.videoDatePublished} views={video.videoViews} />
+                                        </a></div>
+                                    <div className="play"><a href={"#/"} onClick={() => { setVideoTopic(video.videoID); setVideoURL(video.videoUrl); setQuizBtn(false); updateUserInFirestore(video.videoTitle) }}><img src={"./images/play-circle-regular.svg"} alt="" /></a></div>
+                                </div>)
+                            })
+                        }
+                    </div>}
                 </div>
             </div>
         </>
