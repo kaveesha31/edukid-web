@@ -83,7 +83,7 @@ export const AuthProvider = ({ children }: any) => {
               const StudentGrade = userData.StudentGrade;
               const TeacherGrade = userData.TeacherGrade;
               const score = userData.score;
-              const history = userData.userFirestore ? userData.userFirestore : "no data";
+              const history = userData.userFirestore;
               return Object.assign(
                 {},
                 {

@@ -43,7 +43,7 @@ interface IVideo {
     ranking_score: number;
     unlikes: number;
     likes: number;
-    style: string;
+    videoStyle: string;
 }
 
 interface User {
@@ -72,8 +72,8 @@ const initUser: User = {
 
 const filters = [
     'animation',
-    'khan-style',
-    'taking-head',
+    'khanStyle',
+    'takingHead',
     'whiteboard',
 ];
 
@@ -97,7 +97,7 @@ export function Home() {
     const [user, setuser] = useState(initUser);
     const [filter, setFilter] = React.useState<string[]>([]);
     const [fillVideos, setFillVideos] = useState<IVideo[]>([]);
-    const [videoID,setSelectedVideo] = useState<string>("");
+    const [videoID, setSelectedVideo] = useState<string>("");
 
 
     const handleLogOut = async () => {
@@ -118,10 +118,10 @@ export function Home() {
 
     const filtering = (data: any) => {
 
-        let tempIVideoAnimation: IVideo[] = [];
-        let tempIVideotakingHead: IVideo[] = [];
-        let tempIVideokhanStyle: IVideo[] = [];
-        let tempIVideoWhiteboard: IVideo[] = [];
+        let tempIVideo01: IVideo[] = [];
+        let tempIVideo02: IVideo[] = [];
+        let tempIVideo03: IVideo[] = [];
+        let tempIVideo04: IVideo[] = [];
         let tempIVideo: IVideo[] = [];
 
         const a = filter[0];
@@ -130,17 +130,30 @@ export function Home() {
         const d = filter[3];
 
         if (a) {
-            tempIVideoAnimation = data.filter((x: any) => (x.style === a));
+            tempIVideo01 = data.filter((x: any) => (x.videoStyle === a));
         } if (b) {
-            tempIVideotakingHead = data.filter((x: any) => (x.style === b));
+            tempIVideo02 = data.filter((x: any) => (x.videoStyle === b));
         } if (c) {
-            tempIVideokhanStyle.push(data.filter((x: any) => (x.style === c)));
+            tempIVideo03.push(data.filter((x: any) => (x.videoStyle === c)));
         } if (d) {
-            tempIVideoWhiteboard.push(data.filter((x: any) => (x.style === d)));
+            tempIVideo04.push(data.filter((x: any) => (x.videoStyle === d)));
         }
 
-        tempIVideo = tempIVideotakingHead.concat(tempIVideoAnimation, tempIVideokhanStyle, tempIVideoWhiteboard);
-        setFillVideos(tempIVideo);
+        console.log("filter", filter)
+
+        if (tempIVideo01.length !== 0) {
+            tempIVideo = tempIVideo01;
+            setFillVideos(tempIVideo);
+        } if (tempIVideo02.length !== 0) {
+            tempIVideo = tempIVideo01.concat(tempIVideo02);
+            setFillVideos(tempIVideo);
+        } if (tempIVideo03.length !== 0) {
+            tempIVideo = tempIVideo01.concat(tempIVideo02, tempIVideo03);
+            setFillVideos(tempIVideo);
+        } if (tempIVideo04.length !== 0) {
+            tempIVideo = tempIVideo01.concat(tempIVideo02, tempIVideo03, tempIVideo04);
+            setFillVideos(tempIVideo);
+        }
     }
 
     useEffect(() => {
@@ -228,55 +241,55 @@ export function Home() {
             )
     };
 
-    async function updateLikes(isIncrement : boolean) {
+    async function updateLikes(isIncrement: boolean) {
         await firebase.firestore()
             .collection('videos_automated')
             .doc(videoID)
             .update({
-                likes : FieldValue.increment(isIncrement ? 1 : -1)
+                likes: FieldValue.increment(isIncrement ? 1 : -1)
             });
     }
 
-    async function updateDislikes(isIncrement : boolean) {
+    async function updateDislikes(isIncrement: boolean) {
         await firebase.firestore()
             .collection('videos_automated')
             .doc(videoID)
             .update({
-                unlikes : FieldValue.increment(isIncrement ? 1 : -1)
+                unlikes: FieldValue.increment(isIncrement ? 1 : -1)
             });
     }
 
     async function clickLike() {
-        if(like) {
+        if (like) {
             setLike(false);
             await updateLikes(false);
-            setLikeCount(likeCount-1);
+            setLikeCount(likeCount - 1);
         } else {
-            if(unLike) {
+            if (unLike) {
                 setUnLike(false);
                 await updateDislikes(false);
-                setUnlikeCount(unlikeCount-1);
+                setUnlikeCount(unlikeCount - 1);
             }
             setLike(true);
             await updateLikes(true);
-            setLikeCount(likeCount+1);
+            setLikeCount(likeCount + 1);
         }
     }
 
     async function clickDislike() {
-        if(unLike) {
+        if (unLike) {
             setUnLike(false);
             await updateDislikes(false);
-            setUnlikeCount(unlikeCount-1);
+            setUnlikeCount(unlikeCount - 1);
         } else {
-            if(like) {
+            if (like) {
                 setLike(false);
                 await updateLikes(false);
-                setLikeCount(likeCount-1);
+                setLikeCount(likeCount - 1);
             }
             setUnLike(true);
             await updateDislikes(true);
-            setUnlikeCount(unlikeCount+1);
+            setUnlikeCount(unlikeCount + 1);
         }
     }
 
@@ -465,7 +478,7 @@ export function Home() {
                                         }} style={{ textDecoration: "none" }}><Video title={video.videoTitle} thumbnail={video.videoImage}
                                             publishedDate={video.videoDatePublished} views={video.videoViews} />
                                         </a></div>
-                                    <div className="play"><a href={"#/"} onClick={() => { setVideoTopic(video.videoID); setVideoURL(video.videoUrl); setQuizBtn(false); updateUserInFirestore(video.videoTitle) }}><img src={"./images/play-circle-regular.svg"} alt="" /></a></div>
+                                    <div className="play"><a href={"#/"} onClick={() => { setVideoTopic(video.videoID); setVideoURL(video.videoUrl); setQuizBtn(false); updateUserInFirestore(video.videoTitle); setuser({ ...user, history: authContext.history }); popArrayElements(video.videoTitle); }}><img src={"./images/play-circle-regular.svg"} alt="" /></a></div>
                                 </div>)
                             })
                         }
