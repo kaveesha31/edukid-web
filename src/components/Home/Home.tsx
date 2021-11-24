@@ -16,6 +16,10 @@ import ListItemText from '@mui/material/ListItemText';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import Checkbox from '@mui/material/Checkbox';
 import FieldValue = firebase.firestore.FieldValue;
+import FormGroup from '@mui/material/FormGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+
+const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
 
 
 const ITEM_HEIGHT = 48;
@@ -44,6 +48,7 @@ interface IVideo {
     unlikes: number;
     likes: number;
     videoStyle: string;
+    videoQualityRecommendation: boolean;
 }
 
 interface User {
@@ -77,11 +82,16 @@ const filters = [
     'whiteboard',
 ];
 
+const filterQuality = [
+    'recommended',
+];
+
 export function Home() {
 
     const db = firebase.firestore();
     const [videos, setVideos] = useState<IVideo[]>([]);
     const [filteredVideos, setFilteredVideos] = useState<IVideo[]>([]);
+    const [recommendedVideos, setRecommendedVideos] = useState<IVideo[]>([]);
     const [search, setSearch] = useState<string>("");
     const [videoURL, setVideoURL] = useState<string>("");
     const [videoTopic, setVideoTopic] = useState<string>("");
@@ -97,7 +107,9 @@ export function Home() {
     const [user, setuser] = useState(initUser);
     const [filter, setFilter] = React.useState<string[]>([]);
     const [fillVideos, setFillVideos] = useState<IVideo[]>([]);
+    const [fillAndRecommendedVideos, setFillAndRecommendedVideos] = useState<IVideo[]>([]);
     const [videoID, setSelectedVideo] = useState<string>("");
+    const [quality, setQuality] = useState(false);
 
 
     const handleLogOut = async () => {
@@ -115,6 +127,10 @@ export function Home() {
             typeof value === 'string' ? value.split(',') : value,
         );
     };
+
+    console.log("recommendedVideos", recommendedVideos);
+    console.log("fillAndRecommendedVideos", fillAndRecommendedVideos);
+    console.log("fillVideos", fillVideos);
 
     const filtering = (data: any) => {
 
@@ -134,9 +150,9 @@ export function Home() {
         } if (b) {
             tempIVideo02 = data.filter((x: any) => (x.videoStyle === b));
         } if (c) {
-            tempIVideo03.push(data.filter((x: any) => (x.videoStyle === c)));
+            tempIVideo03 = data.filter((x: any) => (x.videoStyle === c));
         } if (d) {
-            tempIVideo04.push(data.filter((x: any) => (x.videoStyle === d)));
+            tempIVideo04 = data.filter((x: any) => (x.videoStyle === d));
         }
 
         console.log("filter", filter)
@@ -211,6 +227,24 @@ export function Home() {
         setFilteredVideos(temp);
     }, [search, videos])
 
+    useEffect(() => {
+        let temp: IVideo[] = [];
+        videos.map(video => {
+            if (video.videoQualityRecommendation === true) {
+                temp.push(video);
+            }
+
+            return () => {
+                // none
+            }
+        });
+
+        // sort by ranking score in descending order
+        temp.sort((a, b) => { return (b.ranking_score - a.ranking_score) });
+
+        setRecommendedVideos(temp);
+    }, [videos])
+
     // console.log("user.history", user.history)
     console.log("filter", filter)
 
@@ -240,6 +274,22 @@ export function Home() {
                 { merge: true }
             )
     };
+
+    const recommended = () => {
+
+        let temp: IVideo[] = [];
+        fillVideos.map(video => {
+            if (video.videoQualityRecommendation === true) {
+                temp.push(video);
+            }
+
+            return () => {
+                // none
+            }
+        });
+
+        setFillAndRecommendedVideos(temp)
+    }
 
     async function updateLikes(isIncrement: boolean) {
         await firebase.firestore()
@@ -315,14 +365,14 @@ export function Home() {
 
                 <div className="header__search">
                     <form action="">
-                        <input type="text" placeholder="Search" onChange={(e) => { setSearch(e.target.value) }} />
+                        <input type="text" style={{ width: "250px" }} placeholder="Search" onChange={(e) => { setSearch(e.target.value) }} />
                         <button><i className="material-icons">search</i></button>
                     </form>
                 </div>
 
-                <div>
-                    <FormControl sx={{ m: 1, width: 300 }}>
-                        <InputLabel id="demo-multiple-checkbox-label">Filter</InputLabel>
+                <div style={{ marginLeft: "50px" }}>
+                    <FormControl sx={{ m: 1, width: 200 }}>
+                        <InputLabel id="demo-multiple-checkbox-label">Filter by video style</InputLabel>
                         <Select
                             style={{ height: "50px" }}
                             labelId="demo-multiple-checkbox-label"
@@ -346,7 +396,16 @@ export function Home() {
 
                 <button style={{ color: "Highlight", border: "none" }} className="material-icons" onClick={() => { filtering(filteredVideos) }}>filter_alt</button>
 
-                <div className="header__icons">
+                <div style={{ marginLeft: "50px" }}>
+                    <FormGroup style={{paddingTop:"10px"}}>
+                        <FormControlLabel control={<Checkbox onChange={(event:any)=>{
+                            setQuality(event.target.checked);
+                            recommended();
+                        }} />} label="Filter by quality" />
+                    </FormGroup>
+                </div>
+
+                <div style={{ marginLeft: "50px" }} className="header__icons">
                     <div className="dropdown">
                         <button className="dropbtn"><i className="material-icons display-this">account_circle</i></button>
                         <div className="dropdown-content">
@@ -440,7 +499,7 @@ export function Home() {
                         </div>
                         : null
                     }
-                    {filter.length === 0 && <div className="videos__container">
+                    {(filter.length === 0 && quality === false) && <div className="videos__container">
                         {
                             filteredVideos.filter((item: any) => (
                                 (item.grade === authContext.StudentGrade)
@@ -462,9 +521,51 @@ export function Home() {
                             })
                         }
                     </div>}
-                    {filter.length != 0 && <div className="videos__container">
+                    {(filter.length != 0 && quality === false) && <div className="videos__container">
                         {
                             fillVideos.filter((item: any) => (
+                                (item.grade === authContext.StudentGrade)
+                            )).map(video => {
+
+                                return (<div className="itemsContainer">
+                                    <div className="image">
+                                        <a href={"#/"} onClick={() => {
+                                            setVideoTopic(video.videoID); setVideoURL(video.videoUrl); setQuizBtn(false);
+                                            setLikeCount(video.likes);
+                                            setUnlikeCount(video.unlikes); setViewsCount(video.videoViews);
+                                            setuser({ ...user, history: authContext.history }); popArrayElements(video.videoTitle);
+                                        }} style={{ textDecoration: "none" }}><Video title={video.videoTitle} thumbnail={video.videoImage}
+                                            publishedDate={video.videoDatePublished} views={video.videoViews} />
+                                        </a></div>
+                                    <div className="play"><a href={"#/"} onClick={() => { setVideoTopic(video.videoID); setVideoURL(video.videoUrl); setQuizBtn(false); updateUserInFirestore(video.videoTitle); setuser({ ...user, history: authContext.history }); popArrayElements(video.videoTitle); }}><img src={"./images/play-circle-regular.svg"} alt="" /></a></div>
+                                </div>)
+                            })
+                        }
+                    </div>}
+                    {(quality === true && filter.length === 0) && <div className="videos__container">
+                        {
+                            recommendedVideos.filter((item: any) => (
+                                (item.grade === authContext.StudentGrade)
+                            )).map(video => {
+
+                                return (<div className="itemsContainer">
+                                    <div className="image">
+                                        <a href={"#/"} onClick={() => {
+                                            setVideoTopic(video.videoID); setVideoURL(video.videoUrl); setQuizBtn(false);
+                                            setLikeCount(video.likes);
+                                            setUnlikeCount(video.unlikes); setViewsCount(video.videoViews);
+                                            setuser({ ...user, history: authContext.history }); popArrayElements(video.videoTitle);
+                                        }} style={{ textDecoration: "none" }}><Video title={video.videoTitle} thumbnail={video.videoImage}
+                                            publishedDate={video.videoDatePublished} views={video.videoViews} />
+                                        </a></div>
+                                    <div className="play"><a href={"#/"} onClick={() => { setVideoTopic(video.videoID); setVideoURL(video.videoUrl); setQuizBtn(false); updateUserInFirestore(video.videoTitle); setuser({ ...user, history: authContext.history }); popArrayElements(video.videoTitle); }}><img src={"./images/play-circle-regular.svg"} alt="" /></a></div>
+                                </div>)
+                            })
+                        }
+                    </div>}
+                    {(quality === true && filter.length != 0) && <div className="videos__container">
+                        {
+                            fillAndRecommendedVideos.filter((item: any) => (
                                 (item.grade === authContext.StudentGrade)
                             )).map(video => {
 
